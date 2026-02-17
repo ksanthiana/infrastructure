@@ -19,28 +19,53 @@ function uid(prefix = "id") {
 
 // -------------------- 1. TOURISM MODULE --------------------
 
-function renderDestinations() {
+function renderDestinations(filter = {}) {
   const container = $("destinations");
   if (!container) return;
 
-  // Use the 'destinations' array from data.js
-  container.innerHTML = destinations
+  let data = destinations;
+
+  if (filter.search) {
+    const term = filter.search.toLowerCase();
+    data = data.filter(d => d.name.toLowerCase().includes(term) || d.description.toLowerCase().includes(term));
+  }
+  if (filter.region) {
+    data = data.filter(d => d.region === filter.region);
+  }
+  if (filter.category) {
+    data = data.filter(d => d.category.includes(filter.category)); // Loose match in case of multiple categories
+  }
+
+  container.innerHTML = data
     .map(
       (d) => `
       <div class="card">
-        <img src="${d.image}" alt="${d.name}" loading="lazy" style="height: 200px; width: 100%; object-fit: cover; border-radius: 8px 8px 0 0;">
+        <div style="position:relative;">
+          <img src="${d.image}" alt="${d.name}" loading="lazy" style="height: 200px; width: 100%; object-fit: cover; border-radius: 8px 8px 0 0;">
+          <span style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.7); color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;">${d.region}</span>
+        </div>
         <div class="card-content">
           <h3>${d.name}</h3>
-          <p><strong>Region:</strong> ${d.region}</p>
-          <p><strong>Category:</strong> ${d.category}</p>
+          <p style="font-size:0.9rem; color:#666; margin-bottom:0.5rem;">${d.category}</p>
           <p>${d.description.substring(0, 100)}...</p>
-          <a class="btn" href="destination.html?id=${encodeURIComponent(d.id)}">View details</a>
+          <a class="btn" style="margin-top:auto;" href="destination.html?id=${encodeURIComponent(d.id)}">View details</a>
         </div>
       </div>
     `
     )
     .join("");
+
+  if (data.length === 0) {
+    container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-style: italic; color: #666;">No destinations found matching your criteria.</p>`;
+  }
 }
+
+window.filterDestinations = function () {
+  const search = $("searchDest").value;
+  const region = $("filterRegion").value;
+  const category = $("filterCategory").value;
+  renderDestinations({ search, region, category });
+};
 
 function renderDestinationDetails() {
   const detailsBox = $("destinationDetails");
@@ -127,32 +152,73 @@ function readinessLabel(score) {
 function renderInfrastructure() {
   const container = $("zones");
   if (!container) return;
+  container.style.display = "block"; // Override grid layout
 
-  container.innerHTML = tourismZones
-    .map((z) => {
-      const overall = averageScore([z.road, z.transport, z.ict, z.electricity, z.water, z.accommodation]);
-      return `
-        <div class="card">
-          <h3>${z.name}</h3>
-          <p><strong>Overall readiness:</strong> ${overall}/100 (${readinessLabel(overall)})</p>
-          <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <p>Road: ${z.road}/100</p>
-              <p>Transport: ${z.transport}/100</p>
-              <p>ICT: ${z.ict}/100</p>
-              <p>Electricity: ${z.electricity}/100</p>
-              <p>Water: ${z.water}/100</p>
-              <p>Accommodation: ${z.accommodation}/100</p>
-          </div>
+  const getProgressBar = (val, color = "#088395") => `
+    <div style="background:#e0e0e0; border-radius:4px; height:8px; width:100%; margin-top:4px;">
+      <div style="background:${color}; height:8px; border-radius:4px; width:${val}%"></div>
+    </div>
+    <div style="font-size:0.75rem; color:#666; text-align:right;">${val}%</div>
+  `;
 
-          <button class="btn" style="margin-top: 15px;" ${isAdmin() ? "" : "disabled"} onclick="exportZone('${z.id}')">
-            Export mini report
-          </button>
-          ${isAdmin() ? "" : "<p style='font-size: 0.8rem; color: #666;'><em>Login as Admin to export reports.</em></p>"}
-        </div>
-      `;
-    })
-    .join("");
+  // Render as a responsive table/dashboard
+  container.innerHTML = `
+    <div class="card" style="overflow-x: auto; padding: 0;">
+      <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+        <thead>
+          <tr style="background: var(--secondary-color); color: white; text-align: left;">
+            <th style="padding: 1rem;">Zone / Region</th>
+            <th style="padding: 1rem;">Overall Score</th>
+            <th style="padding: 1rem;">Roads</th>
+            <th style="padding: 1rem;">ICT / Net</th>
+            <th style="padding: 1rem;">Power</th>
+            <th style="padding: 1rem;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tourismZones.map(z => {
+    const overall = averageScore([z.road, z.transport, z.ict, z.electricity, z.water, z.accommodation]);
+    let badgeColor = overall >= 75 ? "#10b981" : overall >= 50 ? "#f59e0b" : "#ef4444";
+
+    return `
+            <tr style="border-bottom: 1px solid #eee;">
+              <td style="padding: 1rem; font-weight: 600;">${z.name}</td>
+              <td style="padding: 1rem;">
+                <span style="background:${badgeColor}; color:white; padding:4px 8px; border-radius:12px; font-size:0.85rem;">
+                  ${overall}/100
+                </span>
+              </td>
+              <td style="padding: 1rem; width: 15%;">${getProgressBar(z.road)}</td>
+              <td style="padding: 1rem; width: 15%;">${getProgressBar(z.ict, "#3b82f6")}</td>
+              <td style="padding: 1rem; width: 15%;">${getProgressBar(z.electricity, "#f59e0b")}</td>
+              <td style="padding: 1rem;">
+                <button class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" ${isAdmin() ? "" : "disabled"} onclick="exportZone('${z.id}')">
+                  Export
+                </button>
+              </td>
+            </tr>
+            `;
+  }).join("")}
+        </tbody>
+      </table>
+      ${!isAdmin() ? "<p style='padding:1rem; font-size:0.8rem; color:#666; text-align:center;'><em>Login as Admin to export full reports.</em></p>" : ""}
+    </div>
+    
+    <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+      <div class="card" style="text-align:center; padding: 2rem;">
+        <h3 style="font-size:2rem; color:var(--primary-color); margin-bottom:0.5rem;">${tourismZones.length}</h3>
+        <p>Monitored Zones</p>
+      </div>
+      <div class="card" style="text-align:center; padding: 2rem;">
+        <h3 style="font-size:2rem; color:#10b981; margin-bottom:0.5rem;">85%</h3>
+        <p>Avg Urban Readiness</p>
+      </div>
+      <div class="card" style="text-align:center; padding: 2rem;">
+        <h3 style="font-size:2rem; color:#f59e0b; margin-bottom:0.5rem;">62%</h3>
+        <p>Avg Rural Connectivity</p>
+      </div>
+    </div>
+  `;
 }
 
 window.exportZone = function (zoneId) {
@@ -205,18 +271,36 @@ function saveInquiries(items) {
 function renderInvestment() {
   const box = $("investmentBox");
   if (!box) return;
+  box.style.display = "block"; // Override grid layout
 
   const user = getSession();
 
   // Highlighted opportunities (could be dynamic later)
+  // Highlighted opportunities from data.js
   const opportunitiesHtml = `
-    <div class="card">
-      <h3>Priority Investment Zones</h3>
-      <ul>
-        <li><strong>Bujumbura:</strong> Luxury Eco-Hotel & Conference Center along Lake Tanganyika. High readiness.</li>
-        <li><strong>Gitega:</strong> Cultural Heritage Center and budget accommodation upgrades. Moderate readiness.</li>
-        <li><strong>Kibira:</strong> Sustainable Eco-Lodge & Primate Tracking infrastructure. Needs transport investment.</li>
-      </ul>
+    <div style="margin-bottom: 2rem;">
+      <h2 style="text-align:center; margin-bottom: 1.5rem; color: var(--primary-color);">Priority Investment Projects</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        ${investmentOpportunities.map(inv => `
+          <div class="card" style="display:flex; flex-direction:column;">
+            <img src="${inv.image}" alt="${inv.title}" style="height:180px; width:100%; object-fit:cover; border-radius:8px 8px 0 0;">
+            <div class="card-content">
+              <h3>${inv.title}</h3>
+              <p style="font-size:0.9rem; color:#666; margin-bottom:0.5rem;">📍 ${inv.location} | 🏭 ${inv.sector}</p>
+              <p style="flex-grow:1; margin-bottom:1rem;">${inv.description}</p>
+              
+              <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:1rem; font-size:0.9rem;">
+                <p><strong>Impact:</strong> ${inv.expectedImpact}</p>
+                <p><strong>Est. ROI:</strong> ${inv.roi}</p>
+              </div>
+
+              <button class="btn" style="width:100%;" onclick="$('inqMessage').value='Inquiry regarding: ${inv.title}'; ('inqZone').scrollIntoView({behavior: 'smooth'});">
+                Request Prospectus
+              </button>
+            </div>
+          </div>
+        `).join("")}
+      </div>
     </div>
   `;
 
@@ -478,51 +562,76 @@ function renderAdminPanel() {
   const user = requireAuth(["Admin"]);
   if (!user) return;
 
+  // Helper Table Structure
+  const createTable = (headers, rowsHtml) => `
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; min-width:600px;">
+        <thead>
+          <tr style="background:#f1f5f9; text-align:left;">
+            ${headers.map(h => `<th style="padding:1rem; border-bottom:2px solid #e2e8f0;">${h}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml || '<tr><td colspan="' + headers.length + '" style="padding:1rem; text-align:center;">No data found.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  `;
+
   // Inquiries
   const inquiries = getInquiries();
-  inqBox.innerHTML = inquiries.length
-    ? inquiries.map(i => `
-      <div class="mini-card" style="border-left: 4px solid ${i.status === 'New' ? 'red' : 'green'}; padding-left: 10px;">
-        <p><strong>${i.status}</strong> — ${new Date(i.createdAt).toLocaleDateString()}</p>
-        <p><strong>From:</strong> ${i.investorName} (${i.investorEmail})</p>
-        <p><strong>Zone:</strong> ${i.zone} | <strong>Type:</strong> ${i.type}</p>
-        <p><em>"${i.message}"</em></p>
-        <div>
-          <button class="btn-small" onclick="setInquiryStatus('${i.id}', 'In Review')">Mark Reading</button>
-          <button class="btn-small" onclick="setInquiryStatus('${i.id}', 'Resolved')">Mark Resolved</button>
-        </div>
-      </div>
-      <hr>
+  inqBox.innerHTML = createTable(
+    ["Date", "Status", "Investor", "Interest", "Message", "Actions"],
+    inquiries.map(i => `
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:1rem;">${new Date(i.createdAt).toLocaleDateString()}</td>
+        <td style="padding:1rem;"><span style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:${i.status === 'New' ? '#fee2e2; color:#b91c1c' : '#dcfce7; color:#15803d'}">${i.status}</span></td>
+        <td style="padding:1rem;"><strong>${i.investorName}</strong><br><span style="font-size:0.8rem; color:#666;">${i.investorEmail}</span></td>
+        <td style="padding:1rem;">${i.zone}<br><span style="font-size:0.8rem;">${i.type}</span></td>
+        <td style="padding:1rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${i.message}">${i.message}</td>
+        <td style="padding:1rem;">
+           <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem;" onclick="setInquiryStatus('${i.id}', 'Read')">Read</button>
+        </td>
+      </tr>
     `).join("")
-    : "<p><em>No inquiries yet.</em></p>";
+  );
 
   // Services
   const services = getServices();
-  svcBox.innerHTML = services.length
-    ? services.map(s => `
-      <div class="mini-card" style="border-left: 4px solid ${s.status === 'Pending' ? 'orange' : 'blue'}; padding-left: 10px;">
-        <p><strong>${s.status}</strong> — ${s.businessName}</p>
-        <p>Owner: ${s.ownerName}</p>
-        <p><em>${s.description}</em></p>
-        <div>
-          <button class="btn-small" onclick="setServiceStatus('${s.id}', 'Approved')">Approve</button>
-          <button class="btn-small" onclick="setServiceStatus('${s.id}', 'Rejected')">Reject</button>
-        </div>
-      </div>
-      <hr>
+  svcBox.innerHTML = createTable(
+    ["Business Name", "Owner", "Category", "Location", "Status", "Actions"],
+    services.map(s => `
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:1rem;"><strong>${s.businessName}</strong></td>
+        <td style="padding:1rem;">${s.ownerName}</td>
+        <td style="padding:1rem;">${s.category}</td>
+        <td style="padding:1rem;">${s.location}</td>
+        <td style="padding:1rem;"><span style="background:${s.status === 'Pending' ? '#ffedd5' : '#dbeafe'}; padding:4px 8px; border-radius:4px; font-size:0.8rem;">${s.status}</span></td>
+        <td style="padding:1rem; display:flex; gap:5px;">
+          <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem; background:#10b981;" onclick="setServiceStatus('${s.id}', 'Approved')">✓</button>
+          <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem; background:#ef4444;" onclick="setServiceStatus('${s.id}', 'Rejected')">✗</button>
+        </td>
+      </tr>
     `).join("")
-    : "<p><em>No services yet.</em></p>";
+  );
 
   // Jobs
   const jobs = getJobs();
-  jobBox.innerHTML = jobs.length
-    ? jobs.map(j => `
-      <div class="mini-card">
-        <p><strong>${j.title}</strong> at ${j.company}</p>
-        <button class="btn-small" style="background:#cc0000;" onclick="deleteJob('${j.id}')">Delete</button>
-      </div>
+  jobBox.innerHTML = createTable(
+    ["Title", "Company", "Type", "Location", "Posted", "Actions"],
+    jobs.map(j => `
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:1rem;"><strong>${j.title}</strong></td>
+        <td style="padding:1rem;">${j.company}</td>
+        <td style="padding:1rem;">${j.type}</td>
+        <td style="padding:1rem;">${j.location}</td>
+        <td style="padding:1rem;">${new Date(j.createdAt).toLocaleDateString()}</td>
+        <td style="padding:1rem;">
+          <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem; background:#ef4444;" onclick="deleteJob('${j.id}')">Delete</button>
+        </td>
+      </tr>
     `).join("")
-    : "<p><em>No jobs yet.</em></p>";
+  );
 }
 
 // Admin Actions (Global)

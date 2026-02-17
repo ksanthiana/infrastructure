@@ -12,24 +12,45 @@
 
 <body>
 
-  <header>
-    <h1>Smart Infrastructure & Tourism Platform</h1>
-    <p>Connecting Tourism, Infrastructure, Investment & Communities</p>
-  </header>
-
+  <!-- Navigation -->
   <nav>
-    <a href="index.html">Home</a>
-    <a href="tourism.html" class="active">Tourism</a>
-    <a href="infrastructure.html">Infrastructure</a>
-    <a href="investment.html">Investment</a>
-    <a href="community.html">Community</a>
-    <a href="admin.html">Admin</a>
-    <div id="authBox" class="authBox"></div>
+    <div class="logo">
+      <span>🇧🇮</span> SIT Burundi
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="tourism.html" class="active">Tourism</a>
+      <a href="infrastructure.html">Infrastructure</a>
+      <a href="investment.html">Investment</a>
+      <a href="community.html">Community</a>
+      <a href="admin.html">Admin</a>
+      <div id="authBox"></div>
+    </div>
   </nav>
 
-  <section class="hero">
-    <h2>Destinations</h2>
-    <p>Select a destination to view details.</p>
+  <h2>Destinations</h2>
+  <p>Select a destination to view details.</p>
+  </section>
+
+  <section class="container" style="padding: 2rem 1.5rem 0;">
+    <div
+      style="display: flex; gap: 1rem; flex-wrap: wrap; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+      <input type="text" id="searchDest" placeholder="Search destinations..." style="flex: 2; margin: 0;">
+      <select id="filterRegion" style="flex: 1; margin: 0;">
+        <option value="">All Regions</option>
+        <option value="West">West</option>
+        <option value="Central">Central</option>
+        <option value="North-West">North-West</option>
+        <option value="South-East">South-East</option>
+      </select>
+      <select id="filterCategory" style="flex: 1; margin: 0;">
+        <option value="">All Categories</option>
+        <option value="Nature">Nature</option>
+        <option value="Culture">Culture</option>
+        <option value="Beaches">Beaches</option>
+      </select>
+      <button class="btn" style="flex: 0 0 auto; padding: 0.8rem 2rem;" onclick="filterDestinations()">Search</button>
+    </div>
   </section>
 
   <section class="cards" id="destinations"></section>

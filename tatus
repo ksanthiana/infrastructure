@@ -1,0 +1,19 @@
+[33mcommit 68459804e3de743b7b9a1750dd7e9d28c8d2c227[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: ksanthiana <s.kaze@alustudent.com>
+Date:   Tue Feb 17 12:21:22 2026 +0200
+
+    UI Refinements: Reduced hero spacing and added horizontal scroll for destinations
+
+[33mcommit 0afb478a5a791394902ce658057277e22d35bfb7[m
+Author: ksanthiana <s.kaze@alustudent.com>
+Date:   Tue Feb 17 12:08:53 2026 +0200
+
+    Add GitHub Actions workflow for GitHub Pages deployment
+    
+    This workflow automates the deployment of static content to GitHub Pages upon pushes to the master branch or manually from the Actions tab.
+
+[33mcommit e51b37fd806cdfd1eba584a2e5bd641265257922[m
+Author: ksanthiana <s.kaze@alustudent.com>
+Date:   Tue Feb 17 11:54:02 2026 +0200
+
+    Initial commit: Smart Tourism Burundi website files
