@@ -1,49 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Infrastructure | Smart Tourism Burundi</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Infrastructure — SIT Burundi</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-
-  <!-- Navigation -->
   <nav>
-    <div class="logo">
-      <span>🇧🇮</span> SIT Burundi
-    </div>
+    <div class="logo">SIT <span>Burundi</span></div>
     <div class="nav-links">
       <a href="index.html">Home</a>
       <a href="tourism.html">Tourism</a>
-      <a href="infrastructure.html" class="active">Infrastructure</a>
+      <a class="active" href="infrastructure.html">Infrastructure</a>
       <a href="investment.html">Investment</a>
       <a href="community.html">Community</a>
       <a href="admin.html">Admin</a>
-      <div id="authBox"></div>
+      <a class="btn-nav" href="login.html">Login</a>
     </div>
   </nav>
 
-  <section class="hero">
-    <h2>Infrastructure Readiness Dashboard</h2>
-    <p>Readiness scores per tourism zone (roads, transport, ICT, utilities, accommodation).</p>
+  <section class="stats">
+    <div class="section-header">
+      <h2>Infrastructure Readiness Dashboard</h2>
+      <p>Demo readiness scores (0–100) to show how areas support tourism and investment.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-item">
+        <h4>Roads</h4>
+        <p>72/100</p>
+      </div>
+      <div class="stat-item">
+        <h4>Utilities</h4>
+        <p>65/100</p>
+      </div>
+      <div class="stat-item">
+        <h4>ICT</h4>
+        <p>70/100</p>
+      </div>
+      <div class="stat-item">
+        <h4>Health & Safety</h4>
+        <p>60/100</p>
+      </div>
+    </div>
   </section>
 
-  <section class="cards" id="zones"></section>
+  <section class="cards">
+    <article class="card">
+      <div class="card-content">
+        <div class="card-icon">📍</div>
+        <h3>Zone: Bujumbura Lakeshore</h3>
+        <p>Overall readiness: <strong>78/100</strong>. Good access + strong tourism services.</p>
+        <a class="card-link" href="investment.html">See opportunities →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-content">
+        <div class="card-icon">📍</div>
+        <h3>Zone: Kibira Eco-Tourism</h3>
+        <p>Overall readiness: <strong>64/100</strong>. Improve roads + utilities for growth.</p>
+        <a class="card-link" href="investment.html">See opportunities →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-content">
+        <div class="card-icon">📍</div>
+        <h3>Zone: Gitega Cultural Corridor</h3>
+        <p>Overall readiness: <strong>69/100</strong>. Strong culture, needs accommodation upgrades.</p>
+        <a class="card-link" href="community.html">See local services →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-content">
+        <div class="card-icon">📍</div>
+        <h3>Zone: Rutovu Landmark</h3>
+        <p>Overall readiness: <strong>58/100</strong>. High potential, needs transport + ICT support.</p>
+        <a class="card-link" href="investment.html">See opportunities →</a>
+      </div>
+    </article>
+  </section>
 
   <footer>
-    <p>© 2026 Kaze Ange Santhiana | ALU</p>
+    <div class="footer-bottom">© 2026 SIT Burundi</div>
   </footer>
 
-  <script src="js/data.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
-
+  <script src="script.js"></script>
 </body>
 
 </html>

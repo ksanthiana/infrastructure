@@ -1,49 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Community | Smart Tourism Burundi</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Community — SIT Burundi</title>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-
-    <!-- Navigation -->
     <nav>
-        <div class="logo">
-            <span>🇧🇮</span> SIT Burundi
-        </div>
+        <div class="logo">SIT <span>Burundi</span></div>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="tourism.html">Tourism</a>
             <a href="infrastructure.html">Infrastructure</a>
             <a href="investment.html">Investment</a>
-            <a href="community.html" class="active">Community</a>
+            <a class="active" href="community.html">Community</a>
             <a href="admin.html">Admin</a>
-            <div id="authBox"></div>
+            <a class="btn-nav" href="login.html">Login</a>
         </div>
     </nav>
 
-    <section class="hero">
-        <h2>Community & Jobs</h2>
-        <p>Empowering local communities through jobs and service opportunities.</p>
+    <section class="stats">
+        <div class="section-header">
+            <h2>Community & Jobs</h2>
+            <p>Connect local services to tourists and investors (demo content).</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h4>Jobs</h4>
+                <p>Guide / Driver / Hotel</p>
+            </div>
+            <div class="stat-item">
+                <h4>Services</h4>
+                <p>Food / Crafts / Tours</p>
+            </div>
+            <div class="stat-item">
+                <h4>Training</h4>
+                <p>Hospitality basics</p>
+            </div>
+            <div class="stat-item">
+                <h4>Support</h4>
+                <p>SME visibility</p>
+            </div>
+        </div>
     </section>
 
-    <section class="cards" id="communityBox"></section>
+    <section class="cards">
+        <article class="card">
+            <div class="card-content">
+                <div class="card-icon">🧑💼</div>
+                <h3>Job: Tour Guide (Part-time)</h3>
+                <p>Location: Bujumbura • Language: English/French • Experience: basic.</p>
+                <a class="card-link" href="admin.html">Apply / Post →</a>
+            </div>
+        </article>
+
+        <article class="card">
+            <div class="card-content">
+                <div class="card-icon">🚗</div>
+                <h3>Service: Local Driver</h3>
+                <p>Airport pickup + day trips • Verified contact (demo).</p>
+                <a class="card-link" href="admin.html">List your service →</a>
+            </div>
+        </article>
+
+        <article class="card">
+            <div class="card-content">
+                <div class="card-icon">🍲</div>
+                <h3>Service: Local Food & Catering</h3>
+                <p>Traditional cuisine for visitors and events.</p>
+                <a class="card-link" href="admin.html">List your service →</a>
+            </div>
+        </article>
+
+        <article class="card">
+            <div class="card-content">
+                <div class="card-icon">🧺</div>
+                <h3>Service: Crafts & Souvenirs</h3>
+                <p>Handmade baskets and cultural products supporting local artisans.</p>
+                <a class="card-link" href="admin.html">List your service →</a>
+            </div>
+        </article>
+    </section>
 
     <footer>
-        <p>© 2026 Kaze Ange Santhiana | ALU</p>
+        <div class="footer-bottom">© 2026 SIT Burundi</div>
     </footer>
 
-    <script src="js/data.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/app.js"></script>
-
+    <script src="script.js"></script>
 </body>
 
 </html>

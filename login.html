@@ -1,75 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Login | Smart Tourism Burundi</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — SIT Burundi</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-
-  <header>
-    <h1>Login</h1>
-    <p>Access the platform using your account</p>
-  </header>
-
   <nav>
-    <a href="index.html">Home</a>
-    <a href="tourism.html">Tourism</a>
-    <a href="infrastructure.html">Infrastructure</a>
-    <a href="investment.html">Investment</a>
-    <a href="community.html">Community</a>
-    <a href="admin.html">Admin</a>
-    <div id="authBox" class="authBox"></div>
+    <div class="logo">SIT <span>Burundi</span></div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="tourism.html">Tourism</a>
+      <a href="infrastructure.html">Infrastructure</a>
+      <a href="investment.html">Investment</a>
+      <a href="community.html">Community</a>
+      <a href="admin.html">Admin</a>
+      <a class="btn-nav active" href="login.html">Login</a>
+    </div>
   </nav>
 
-  <section class="card" style="max-width: 400px; margin: 40px auto;">
-    <form id="loginForm">
-      <label>Email</label>
-      <input required id="email" type="email" placeholder="example@email.com" />
+  <section class="stats">
+    <div class="section-header">
+      <h2>Login</h2>
+      <p>Demo login page (no backend yet).</p>
+    </div>
 
-      <label>Password</label>
-      <input required id="password" type="password" placeholder="Your password" />
+    <div class="cards">
+      <article class="card">
+        <div class="card-content">
+          <h3>Sign in</h3>
+          <p>Email</p>
+          <input style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px;" type="email"
+            placeholder="you@example.com" />
+          <p style="margin-top:12px;">Password</p>
+          <input style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px;" type="password"
+            placeholder="••••••••" />
 
-      <button class="btn" type="submit" style="width: 100%;">Login</button>
-      <p style="margin-top: 10px; text-align: center;">No account? <a href="register.html"
-          style="color: var(--secondary-color); font-weight: 600;">Register</a></p>
-    </form>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn btn-primary" href="admin.html">Login</a>
+            <a class="btn btn-secondary" href="register.html">Create account</a>
+          </div>
+        </div>
+      </article>
+    </div>
   </section>
 
   <footer>
-    <p>© 2026 Kaze Ange Santhiana | ALU</p>
+    <div class="footer-bottom">© 2026 SIT Burundi</div>
   </footer>
 
-  <script src="js/auth.js"></script>
-  <script>
-    updateNavAuthUI();
-
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const users = getUsers();
-
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const password = document.getElementById("password").value;
-
-      const user = users.find(u => u.email === email && u.password === password);
-      if (!user) {
-        alert("Invalid email or password.");
-        return;
-      }
-
-      setSession({ name: user.name, email: user.email, role: user.role });
-      alert("Login successful!");
-      window.location.href = "index.html";
-    });
-  </script>
-  <script src="js/data.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/app.js"></script>
+  <script src="script.js"></script>
 </body>
 
 </html>
