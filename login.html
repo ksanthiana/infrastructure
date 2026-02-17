@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | Smart Tourism Burundi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <header>
+    <h1>Login</h1>
+    <p>Access the platform using your account</p>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="tourism.html">Tourism</a>
+    <a href="infrastructure.html">Infrastructure</a>
+    <a href="investment.html">Investment</a>
+    <a href="community.html">Community</a>
+    <a href="admin.html">Admin</a>
+    <div id="authBox" class="authBox"></div>
+  </nav>
+
+  <section class="card" style="max-width: 400px; margin: 40px auto;">
+    <form id="loginForm">
+      <label>Email</label>
+      <input required id="email" type="email" placeholder="example@email.com" />
+
+      <label>Password</label>
+      <input required id="password" type="password" placeholder="Your password" />
+
+      <button class="btn" type="submit" style="width: 100%;">Login</button>
+      <p style="margin-top: 10px; text-align: center;">No account? <a href="register.html"
+          style="color: var(--secondary-color); font-weight: 600;">Register</a></p>
+    </form>
+  </section>
+
+  <footer>
+    <p>© 2026 Kaze Ange Santhiana | ALU</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script>
+    updateNavAuthUI();
+
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const users = getUsers();
+
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) {
+        alert("Invalid email or password.");
+        return;
+      }
+
+      setSession({ name: user.name, email: user.email, role: user.role });
+      alert("Login successful!");
+      window.location.href = "index.html";
+    });
+  </script>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
