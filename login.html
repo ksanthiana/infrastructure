@@ -9,47 +9,106 @@
 </head>
 
 <body>
-  <nav>
-    <div class="logo">SIT <span>Burundi</span></div>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="tourism.html">Tourism</a>
-      <a href="infrastructure.html">Infrastructure</a>
-      <a href="investment.html">Investment</a>
-      <a href="community.html">Community</a>
-      <a href="admin.html">Admin</a>
-      <a class="btn-nav active" href="login.html">Login</a>
+
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-badge"></div>
+        <div>SIT <span>Burundi</span></div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="tourism.html">Tourism</a>
+        <a href="infrastructure.html">Infrastructure</a>
+        <a href="investment.html">Investment</a>
+        <a href="community.html">Community</a>
+        <a href="admin.html">Admin</a>
+        <a class="nav-ghost" href="register.html">Sign up</a>
+        <a class="nav-cta" href="login.html">Login</a>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <section class="stats">
-    <div class="section-header">
-      <h2>Login</h2>
-      <p>Demo login page (no backend yet).</p>
-    </div>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Welcome back</h2>
+        <p>Log in to manage inquiries, services, and job listings (demo).</p>
+      </div>
 
-    <div class="cards">
-      <article class="card">
-        <div class="card-content">
-          <h3>Sign in</h3>
-          <p>Email</p>
-          <input style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px;" type="email"
-            placeholder="you@example.com" />
-          <p style="margin-top:12px;">Password</p>
-          <input style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px;" type="password"
-            placeholder="••••••••" />
+      <div class="grid-2" style="align-items:start">
+        <!-- Form -->
+        <div class="card">
+          <div class="card-body">
+            <span class="badge">🔐 Secure Login</span>
+            <h3 class="card-title" style="margin-top:10px">Sign in</h3>
+            <p class="card-text">Use your email and password to continue.</p>
 
-          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn btn-primary" href="admin.html">Login</a>
-            <a class="btn btn-secondary" href="register.html">Create account</a>
+            <form onsubmit="event.preventDefault(); location.href='admin.html';" style="margin-top:14px">
+              <label style="display:block; font-weight:800; font-size:13px; margin:12px 0 6px">Email</label>
+              <input class="input" type="email" placeholder="you@example.com" required />
+
+              <label style="display:block; font-weight:800; font-size:13px; margin:12px 0 6px">Password</label>
+              <input class="input" type="password" placeholder="••••••••" required />
+
+              <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:12px">
+                <label style="display:flex; gap:8px; align-items:center; font-size:13px; color:rgba(15,23,42,.75)">
+                  <input type="checkbox" />
+                  Remember me
+                </label>
+
+                <a href="#" style="font-size:13px; font-weight:800; color:var(--primary-color,#0B3A6A)">
+                  Forgot password?
+                </a>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px">
+                <button class="btn btn-primary" type="submit">Login</button>
+                <a class="btn btn-secondary" href="register.html">Create account</a>
+              </div>
+
+              <p style="margin:14px 0 0; font-size:12px; color:rgba(15,23,42,.6)">
+                Demo note: this page redirects to Admin without real authentication.
+              </p>
+            </form>
           </div>
         </div>
-      </article>
+
+        <!-- Side info -->
+        <div class="card">
+          <div class="card-body">
+            <span class="badge red">✨ Why login?</span>
+            <h3 class="card-title" style="margin-top:10px">Admin access</h3>
+            <p class="card-text">
+              After logging in, you can review investor inquiries, approve local services, and moderate job listings.
+            </p>
+
+            <div style="margin-top:14px; display:grid; gap:10px">
+              <div class="kpi">
+                <strong>Inquiries</strong>
+                <span>Review and respond</span>
+              </div>
+              <div class="kpi">
+                <strong>Approvals</strong>
+                <span>Verify community services</span>
+              </div>
+              <div class="kpi">
+                <strong>Moderation</strong>
+                <span>Keep listings clean</span>
+              </div>
+            </div>
+
+            <a class="card-link" href="index.html" style="margin-top:14px">Back to Home →</a>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
-  <footer>
-    <div class="footer-bottom">© 2026 SIT Burundi</div>
+  <footer class="footer">
+    <div class="container footer-inner">© 2026 SIT Burundi</div>
   </footer>
 
   <script src="script.js"></script>

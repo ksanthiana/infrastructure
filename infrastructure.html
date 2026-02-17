@@ -9,87 +9,103 @@
 </head>
 
 <body>
-  <nav>
-    <div class="logo">SIT <span>Burundi</span></div>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="tourism.html">Tourism</a>
-      <a class="active" href="infrastructure.html">Infrastructure</a>
-      <a href="investment.html">Investment</a>
-      <a href="community.html">Community</a>
-      <a href="admin.html">Admin</a>
-      <a class="btn-nav" href="login.html">Login</a>
-    </div>
-  </nav>
 
-  <section class="stats">
-    <div class="section-header">
-      <h2>Infrastructure Readiness Dashboard</h2>
-      <p>Demo readiness scores (0–100) to show how areas support tourism and investment.</p>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-badge"></div>
+        <div>SIT <span>Burundi</span></div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="tourism.html">Tourism</a>
+        <a href="infrastructure.html">Infrastructure</a>
+        <a href="investment.html">Investment</a>
+        <a href="community.html">Community</a>
+        <a href="admin.html">Admin</a>
+        <a class="nav-cta" href="login.html">Login</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="stats-grid">
-      <div class="stat-item">
-        <h4>Roads</h4>
-        <p>72/100</p>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Readiness Dashboard</h2>
+        <p>Demo scores to show where development improves tourism + investment outcomes.</p>
       </div>
-      <div class="stat-item">
-        <h4>Utilities</h4>
-        <p>65/100</p>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-body"><span class="badge">🛣️ Roads</span>
+            <h3 class="card-title">72/100</h3>
+            <p class="card-text">Good main access, rural routes need upgrades.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body"><span class="badge">💧 Utilities</span>
+            <h3 class="card-title">65/100</h3>
+            <p class="card-text">Water & power improving, consistency varies.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body"><span class="badge">📶 ICT</span>
+            <h3 class="card-title">70/100</h3>
+            <p class="card-text">Coverage growing; hotspots near key sites.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body"><span class="badge">🧑‍⚕️ Safety</span>
+            <h3 class="card-title">60/100</h3>
+            <p class="card-text">Health services need better access in zones.</p>
+          </div>
+        </div>
       </div>
-      <div class="stat-item">
-        <h4>ICT</h4>
-        <p>70/100</p>
-      </div>
-      <div class="stat-item">
-        <h4>Health & Safety</h4>
-        <p>60/100</p>
-      </div>
+
+      <div style="height:18px"></div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Zone</th>
+            <th>Overall</th>
+            <th>Key Gap</th>
+            <th>Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Bujumbura Lakeshore</strong></td>
+            <td><span class="pill ok">78/100 • Good</span></td>
+            <td>Waste management</td>
+            <td>Improve cleanliness + public facilities.</td>
+          </tr>
+          <tr>
+            <td><strong>Kibira Eco-Tourism</strong></td>
+            <td><span class="pill warn">64/100 • Medium</span></td>
+            <td>Road access</td>
+            <td>Upgrade feeder roads + utilities.</td>
+          </tr>
+          <tr>
+            <td><strong>Gitega Cultural Corridor</strong></td>
+            <td><span class="pill warn">69/100 • Medium</span></td>
+            <td>Accommodation capacity</td>
+            <td>Support eco-lodges + SME hospitality.</td>
+          </tr>
+          <tr>
+            <td><strong>Rutovu Landmark</strong></td>
+            <td><span class="pill bad">58/100 • Low</span></td>
+            <td>Transport + ICT</td>
+            <td>Enable shuttle routes + Wi-Fi points.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <section class="cards">
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">📍</div>
-        <h3>Zone: Bujumbura Lakeshore</h3>
-        <p>Overall readiness: <strong>78/100</strong>. Good access + strong tourism services.</p>
-        <a class="card-link" href="investment.html">See opportunities →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">📍</div>
-        <h3>Zone: Kibira Eco-Tourism</h3>
-        <p>Overall readiness: <strong>64/100</strong>. Improve roads + utilities for growth.</p>
-        <a class="card-link" href="investment.html">See opportunities →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">📍</div>
-        <h3>Zone: Gitega Cultural Corridor</h3>
-        <p>Overall readiness: <strong>69/100</strong>. Strong culture, needs accommodation upgrades.</p>
-        <a class="card-link" href="community.html">See local services →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">📍</div>
-        <h3>Zone: Rutovu Landmark</h3>
-        <p>Overall readiness: <strong>58/100</strong>. High potential, needs transport + ICT support.</p>
-        <a class="card-link" href="investment.html">See opportunities →</a>
-      </div>
-    </article>
-  </section>
-
-  <footer>
-    <div class="footer-bottom">© 2026 SIT Burundi</div>
+  <footer class="footer">
+    <div class="container footer-inner">© 2026 SIT Burundi</div>
   </footer>
-
   <script src="script.js"></script>
 </body>
 

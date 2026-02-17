@@ -9,53 +9,113 @@
 </head>
 
 <body>
-  <nav>
-    <div class="logo">SIT <span>Burundi</span></div>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="tourism.html">Tourism</a>
-      <a href="infrastructure.html">Infrastructure</a>
-      <a href="investment.html">Investment</a>
-      <a href="community.html">Community</a>
-      <a href="admin.html">Admin</a>
-      <a class="btn-nav" href="login.html">Login</a>
+
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-badge"></div>
+        <div>SIT <span>Burundi</span></div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="tourism.html">Tourism</a>
+        <a href="infrastructure.html">Infrastructure</a>
+        <a href="investment.html">Investment</a>
+        <a href="community.html">Community</a>
+        <a href="admin.html">Admin</a>
+        <a class="nav-ghost" href="register.html">Sign up</a>
+        <a class="nav-cta" href="login.html">Login</a>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <section class="stats">
-    <div class="section-header">
-      <h2>Create Account</h2>
-      <p>Demo registration page (no backend yet).</p>
-    </div>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Create your account</h2>
+        <p>Join to submit investment inquiries and manage listings (demo).</p>
+      </div>
 
-    <div class="cards">
-      <article class="card">
-        <div class="card-content">
-          <h3>Sign up</h3>
+      <div class="grid-2" style="align-items:start">
+        <!-- Form -->
+        <div class="card">
+          <div class="card-body">
+            <span class="badge">📝 Registration</span>
+            <h3 class="card-title" style="margin-top:10px">Sign up</h3>
+            <p class="card-text">Fill in your details to create an account.</p>
 
-          <p>Full name</p>
-          <input style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px;" type="text"
-            placeholder="Your name" />
+            <form onsubmit="event.preventDefault(); location.href='login.html';" style="margin-top:14px">
+              <label style="display:block; font-weight:800; font-size:13px; margin:12px 0 6px">Full name</label>
+              <input class="input" type="text" placeholder="Your full name" required />
 
-          <p style="margin-top:12px;">Email</p>
-          <input style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px;" type="email"
-            placeholder="you@example.com" />
+              <label style="display:block; font-weight:800; font-size:13px; margin:12px 0 6px">Email</label>
+              <input class="input" type="email" placeholder="you@example.com" required />
 
-          <p style="margin-top:12px;">Password</p>
-          <input style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px;" type="password"
-            placeholder="Create a password" />
+              <label style="display:block; font-weight:800; font-size:13px; margin:12px 0 6px">Password</label>
+              <input class="input" type="password" placeholder="Create a strong password" required />
 
-          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn btn-primary" href="login.html">Create account</a>
-            <a class="btn btn-secondary" href="login.html">Back to login</a>
+              <label style="display:block; font-weight:800; font-size:13px; margin:12px 0 6px">Role</label>
+              <select class="select" required>
+                <option value="">Select a role</option>
+                <option>Investor</option>
+                <option>Service Provider</option>
+                <option>Job Seeker</option>
+                <option>Admin (Demo)</option>
+              </select>
+
+              <label
+                style="display:flex; gap:8px; align-items:flex-start; margin-top:12px; font-size:13px; color:rgba(15,23,42,.75)">
+                <input type="checkbox" required style="margin-top:3px" />
+                I agree to the terms and confirm the information is correct.
+              </label>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px">
+                <button class="btn btn-primary" type="submit">Create account</button>
+                <a class="btn btn-secondary" href="login.html">Back to login</a>
+              </div>
+
+              <p style="margin:14px 0 0; font-size:12px; color:rgba(15,23,42,.6)">
+                Demo note: this page redirects to Login without saving data.
+              </p>
+            </form>
           </div>
         </div>
-      </article>
+
+        <!-- Side info -->
+        <div class="card">
+          <div class="card-body">
+            <span class="badge red">🚀 What you get</span>
+            <h3 class="card-title" style="margin-top:10px">Platform access</h3>
+            <p class="card-text">
+              Create an account to submit investment inquiries and participate in tourism and community growth.
+            </p>
+
+            <div style="margin-top:14px; display:grid; gap:10px">
+              <div class="kpi">
+                <strong>Submit inquiries</strong>
+                <span>Track your interest in projects</span>
+              </div>
+              <div class="kpi">
+                <strong>List services</strong>
+                <span>Promote local businesses</span>
+              </div>
+              <div class="kpi">
+                <strong>Apply for jobs</strong>
+                <span>Connect with opportunities</span>
+              </div>
+            </div>
+
+            <a class="card-link" href="index.html" style="margin-top:14px">Back to Home →</a>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
-  <footer>
-    <div class="footer-bottom">© 2026 SIT Burundi</div>
+  <footer class="footer">
+    <div class="container footer-inner">© 2026 SIT Burundi</div>
   </footer>
 
   <script src="script.js"></script>

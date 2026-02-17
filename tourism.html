@@ -9,88 +9,136 @@
 </head>
 
 <body>
-  <nav>
-    <div class="logo">SIT <span>Burundi</span></div>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a class="active" href="tourism.html">Tourism</a>
-      <a href="infrastructure.html">Infrastructure</a>
-      <a href="investment.html">Investment</a>
-      <a href="community.html">Community</a>
-      <a href="admin.html">Admin</a>
-      <a class="btn-nav" href="login.html">Login</a>
-    </div>
-  </nav>
 
-  <section class="stats">
-    <div class="section-header">
-      <h2>Tourism Destinations</h2>
-      <p>Browse key destinations and what makes them special (demo content).</p>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-badge"></div>
+        <div>SIT <span>Burundi</span></div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="tourism.html">Tourism</a>
+        <a href="infrastructure.html">Infrastructure</a>
+        <a href="investment.html">Investment</a>
+        <a href="community.html">Community</a>
+        <a href="admin.html">Admin</a>
+        <a class="nav-cta" href="login.html">Login</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="stats-grid">
-      <div class="stat-item">
-        <h4>Filter</h4>
-        <p>Province: All</p>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Tourism Destinations</h2>
+        <p>Search and filter destinations (demo). Click a card to see related readiness/investment.</p>
       </div>
-      <div class="stat-item">
-        <h4>Type</h4>
-        <p>Lake / Park / Culture</p>
+
+      <div class="toolbar">
+        <input id="tourSearch" class="input" placeholder="Search destinations (e.g., lake, park, drums)..." />
+        <select id="tourType" class="select small">
+          <option value="all">All types</option>
+          <option value="lake">Lake</option>
+          <option value="park">Park</option>
+          <option value="culture">Culture</option>
+          <option value="landmark">Landmark</option>
+        </select>
+        <a class="btn btn-secondary" href="infrastructure.html">Open readiness dashboard</a>
       </div>
-      <div class="stat-item">
-        <h4>Search</h4>
-        <p>Try: “Lake”</p>
-      </div>
-      <div class="stat-item">
-        <h4>Tip</h4>
-        <p>Click “Learn More”</p>
+
+      <div style="height:16px"></div>
+
+      <div class="grid-3">
+        <article class="card tourCard" data-tags="lake bujumbura">
+          <div class="cover">
+            <img alt="Lake"
+              src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=60">
+          </div>
+          <div class="card-body">
+            <span class="badge">🌊 Lake</span>
+            <h3 class="card-title">Lake Tanganyika</h3>
+            <p class="card-text">Beaches, sunsets, boating—strong tourism potential near Bujumbura.</p>
+            <a class="card-link" href="infrastructure.html">Check readiness →</a>
+          </div>
+        </article>
+
+        <article class="card tourCard" data-tags="park kibira forest eco">
+          <div class="cover">
+            <img alt="Forest"
+              src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=60">
+          </div>
+          <div class="card-body">
+            <span class="badge">🐒 Park</span>
+            <h3 class="card-title">Kibira National Park</h3>
+            <p class="card-text">Eco-tourism, hiking, biodiversity—needs stronger road & utility support.</p>
+            <a class="card-link" href="investment.html">See investment →</a>
+          </div>
+        </article>
+
+        <article class="card tourCard" data-tags="culture drums gitega">
+          <div class="cover">
+            <img alt="Culture"
+              src="https://images.unsplash.com/photo-1520975958225-3f61d0a1c1a3?auto=format&fit=crop&w=1200&q=60">
+          </div>
+          <div class="card-body">
+            <span class="badge">🎭 Culture</span>
+            <h3 class="card-title">Gishora Drum Sanctuary</h3>
+            <p class="card-text">A powerful cultural heritage experience—great for events and tours.</p>
+            <a class="card-link" href="community.html">Local services →</a>
+          </div>
+        </article>
+
+        <article class="card tourCard" data-tags="landmark nile rutovu">
+          <div class="cover">
+            <img alt="Landmark"
+              src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60">
+          </div>
+          <div class="card-body">
+            <span class="badge">⛰️ Landmark</span>
+            <h3 class="card-title">Source of the Nile (Rutovu)</h3>
+            <p class="card-text">Iconic landmark—high potential with better transport + visitor services.</p>
+            <a class="card-link" href="investment.html">Invest nearby →</a>
+          </div>
+        </article>
+
+        <article class="card tourCard" data-tags="lake rwegura nature">
+          <div class="cover">
+            <img alt="Lake"
+              src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=60">
+          </div>
+          <div class="card-body">
+            <span class="badge">🌊 Lake</span>
+            <h3 class="card-title">Rwegura Reservoir</h3>
+            <p class="card-text">Beautiful views—opportunity for eco-lodges and guided tours.</p>
+            <a class="card-link" href="infrastructure.html">Check readiness →</a>
+          </div>
+        </article>
+
+        <article class="card tourCard" data-tags="culture gitega museum">
+          <div class="cover">
+            <img alt="Culture"
+              src="https://images.unsplash.com/photo-1520975918403-6a8bdc1f6c5a?auto=format&fit=crop&w=1200&q=60">
+          </div>
+          <div class="card-body">
+            <span class="badge">🎭 Culture</span>
+            <h3 class="card-title">Gitega Cultural Corridor</h3>
+            <p class="card-text">Culture, museums, events—needs accommodation & transport upgrades.</p>
+            <a class="card-link" href="investment.html">See opportunities →</a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 
-  <section class="cards">
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">🌊</div>
-        <h3>Lake Tanganyika</h3>
-        <p>Beaches, boating, and sunsets around Bujumbura lakeshore.</p>
-        <a class="card-link" href="infrastructure.html">See readiness →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">🐒</div>
-        <h3>Kibira National Park</h3>
-        <p>Forest trails, birding, primates, and eco-tourism opportunities.</p>
-        <a class="card-link" href="infrastructure.html">See readiness →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">⛰️</div>
-        <h3>Source of the Nile (Rutovu)</h3>
-        <p>A famous landmark and cultural stop for visitors.</p>
-        <a class="card-link" href="investment.html">Invest nearby →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">🎭</div>
-        <h3>Gishora Drum Sanctuary</h3>
-        <p>Traditional drumming heritage and cultural performances.</p>
-        <a class="card-link" href="community.html">Local services →</a>
-      </div>
-    </article>
-  </section>
-
-  <footer>
-    <div class="footer-bottom">© 2026 SIT Burundi</div>
+  <footer class="footer">
+    <div class="container footer-inner">© 2026 SIT Burundi</div>
   </footer>
 
   <script src="script.js"></script>
+  <script>
+    filterCards({ searchId: "tourSearch", selectId: "tourType", cardsSelector: ".tourCard" });
+  </script>
 </body>
 
 </html>

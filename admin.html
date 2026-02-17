@@ -9,87 +9,167 @@
 </head>
 
 <body>
-  <nav>
-    <div class="logo">SIT <span>Burundi</span></div>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="tourism.html">Tourism</a>
-      <a href="infrastructure.html">Infrastructure</a>
-      <a href="investment.html">Investment</a>
-      <a href="community.html">Community</a>
-      <a class="active" href="admin.html">Admin</a>
-      <a class="btn-nav" href="login.html">Login</a>
-    </div>
-  </nav>
 
-  <section class="stats">
-    <div class="section-header">
-      <h2>Admin Dashboard</h2>
-      <p>Demo admin view: inquiries, approvals, and moderation.</p>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-badge"></div>
+        <div>SIT <span>Burundi</span></div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="tourism.html">Tourism</a>
+        <a href="infrastructure.html">Infrastructure</a>
+        <a href="investment.html">Investment</a>
+        <a href="community.html">Community</a>
+        <a href="admin.html">Admin</a>
+        <a class="nav-cta" href="login.html">Login</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="stats-grid">
-      <div class="stat-item">
-        <h4>Inquiries</h4>
-        <p>8 pending</p>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Admin Dashboard</h2>
+        <p>Review investor inquiries, approve services, and moderate jobs (demo).</p>
       </div>
-      <div class="stat-item">
-        <h4>Services</h4>
-        <p>5 pending</p>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-body"><span class="badge">📩 Inquiries</span>
+            <h3 class="card-title">8 Pending</h3>
+            <p class="card-text">Need review & response</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body"><span class="badge">✅ Services</span>
+            <h3 class="card-title">5 Pending</h3>
+            <p class="card-text">Approve verified listings</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body"><span class="badge">🧹 Jobs</span>
+            <h3 class="card-title">3 Pending</h3>
+            <p class="card-text">Remove scams & duplicates</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body"><span class="badge">🗺️ Scores</span>
+            <h3 class="card-title">Update</h3>
+            <p class="card-text">Edit zone readiness</p>
+          </div>
+        </div>
       </div>
-      <div class="stat-item">
-        <h4>Jobs</h4>
-        <p>3 pending</p>
-      </div>
-      <div class="stat-item">
-        <h4>Status</h4>
-        <p>System OK</p>
-      </div>
+
+      <div style="height:18px"></div>
+
+      <h3 style="margin:0 0 10px">Investor Inquiries</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Interest</th>
+            <th>Zone</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GreenWave Capital</td>
+            <td>Eco-lodges</td>
+            <td>Gitega</td>
+            <td><span class="pill warn">Pending</span></td>
+          </tr>
+          <tr>
+            <td>LakeSide Partners</td>
+            <td>Transport</td>
+            <td>Bujumbura</td>
+            <td><span class="pill warn">Pending</span></td>
+          </tr>
+          <tr>
+            <td>ConnectAfrica</td>
+            <td>Wi-Fi hotspots</td>
+            <td>Rutovu</td>
+            <td><span class="pill ok">Reviewed</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="height:18px"></div>
+
+      <h3 style="margin:0 0 10px">Services Approval</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Owner</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Local Driver</td>
+            <td>Jean P.</td>
+            <td>Bujumbura</td>
+            <td><span class="pill warn">Pending</span></td>
+          </tr>
+          <tr>
+            <td>Catering</td>
+            <td>Aline N.</td>
+            <td>Gitega</td>
+            <td><span class="pill ok">Approved</span></td>
+          </tr>
+          <tr>
+            <td>Crafts & Souvenirs</td>
+            <td>Coop Group</td>
+            <td>Gitega</td>
+            <td><span class="pill warn">Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="height:18px"></div>
+
+      <h3 style="margin:0 0 10px">Jobs Moderation</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Job</th>
+            <th>Company</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tour Guide</td>
+            <td>TourCo</td>
+            <td>Bujumbura</td>
+            <td><span class="pill warn">Pending</span></td>
+          </tr>
+          <tr>
+            <td>Reception Assistant</td>
+            <td>Hotel Gitega</td>
+            <td>Gitega</td>
+            <td><span class="pill ok">Approved</span></td>
+          </tr>
+          <tr>
+            <td>Driver</td>
+            <td>ShuttlePro</td>
+            <td>Multiple</td>
+            <td><span class="pill bad">Flagged</span></td>
+          </tr>
+        </tbody>
+      </table>
+
     </div>
   </section>
 
-  <section class="cards">
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">📩</div>
-        <h3>Investor Inquiry Queue</h3>
-        <p>Review inquiries and approve/decline for follow-up (demo).</p>
-        <a class="card-link" href="#">Open list →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">✅</div>
-        <h3>Approve Local Services</h3>
-        <p>Approve verified guides, drivers, and hospitality services.</p>
-        <a class="card-link" href="#">Review services →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">🧹</div>
-        <h3>Moderate Jobs</h3>
-        <p>Remove scams, validate contacts, and keep listings clean.</p>
-        <a class="card-link" href="#">Review jobs →</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="card-content">
-        <div class="card-icon">🗺️</div>
-        <h3>Update Zone Scores</h3>
-        <p>Edit readiness scores for roads, utilities, ICT, and safety.</p>
-        <a class="card-link" href="#">Edit dashboard →</a>
-      </div>
-    </article>
-  </section>
-
-  <footer>
-    <div class="footer-bottom">© 2026 SIT Burundi</div>
+  <footer class="footer">
+    <div class="container footer-inner">© 2026 SIT Burundi</div>
   </footer>
-
   <script src="script.js"></script>
 </body>
 
