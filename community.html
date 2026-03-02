@@ -3,106 +3,49 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Community — SIT Burundi</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-
     <header class="navbar">
         <div class="container navbar-inner">
             <a class="brand" href="index.html">
                 <div class="brand-badge"></div>
                 <div>SIT <span>Burundi</span></div>
             </a>
-            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
-                <span class="nav-toggle-icon" aria-hidden="true">☰</span>
-                <span class="nav-toggle-text">Menu</span>
-            </button>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">☰ Menu</button>
             <nav class="nav-links" id="siteNav">
                 <a href="index.html">Home</a>
                 <a href="tourism.html">Tourism</a>
                 <a href="infrastructure.html">Infrastructure</a>
                 <a href="investment.html">Investment</a>
                 <a href="community.html">Community</a>
-                <a href="admin.html">Admin</a>
-                <a class="nav-cta" href="login.html">Login</a>
+                <a href="admin.html" data-admin-link>Admin</a>
             </nav>
+            <div class="nav-auth" id="authArea"></div>
         </div>
     </header>
 
     <section class="section">
         <div class="container">
             <div class="section-header">
-                <h2>Community & Jobs</h2>
-                <p>Local jobs and services that support tourism growth (demo).</p>
+                <h2>Community & jobs</h2>
+                <p>Support local businesses, create jobs, and grow community participation.</p>
             </div>
-
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge">💼 Jobs</span>
-                        <table style="width:100%; border-collapse:collapse; margin-top:10px">
-                            <tr>
-                                <td style="padding:10px 0; border-bottom:1px solid rgba(229,231,235,.95)"><strong>Tour
-                                        Guide (Part-time)</strong>
-                                    <div style="color:rgba(15,23,42,.65);font-size:12px">Bujumbura • English/French
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding:10px 0; border-bottom:1px solid rgba(229,231,235,.95)"><strong>Hotel
-                                        Reception Assistant</strong>
-                                    <div style="color:rgba(15,23,42,.65);font-size:12px">Gitega • Customer care</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding:10px 0"><strong>Driver (Day trips)</strong>
-                                    <div style="color:rgba(15,23,42,.65);font-size:12px">Multiple zones • License
-                                        required</div>
-                                </td>
-                            </tr>
-                        </table>
-                        <a class="card-link" href="admin.html">Post / Moderate →</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge">🧩 Services</span>
-                        <table style="width:100%; border-collapse:collapse; margin-top:10px">
-                            <tr>
-                                <td style="padding:10px 0; border-bottom:1px solid rgba(229,231,235,.95)"><strong>Local
-                                        Driver</strong>
-                                    <div style="color:rgba(15,23,42,.65);font-size:12px">Airport pickup + day trips
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding:10px 0; border-bottom:1px solid rgba(229,231,235,.95)">
-                                    <strong>Catering (Traditional Cuisine)</strong>
-                                    <div style="color:rgba(15,23,42,.65);font-size:12px">Events + visitor meals</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding:10px 0"><strong>Handmade Crafts</strong>
-                                    <div style="color:rgba(15,23,42,.65);font-size:12px">Souvenirs supporting artisans
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                        <a class="card-link" href="admin.html">List / Approve →</a>
-                    </div>
-                </div>
-            </div>
+            <div id="communityBox"></div>
         </div>
     </section>
 
     <footer class="footer">
         <div class="container footer-inner">© 2026 SIT Burundi</div>
     </footer>
-    <script src="script.js"></script>
+
+    <script src="data.js"></script>
+    <script src="storage.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>

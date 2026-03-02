@@ -3,178 +3,62 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — SIT Burundi</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-
   <header class="navbar">
     <div class="container navbar-inner">
       <a class="brand" href="index.html">
         <div class="brand-badge"></div>
         <div>SIT <span>Burundi</span></div>
       </a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
-        <span class="nav-toggle-icon" aria-hidden="true">☰</span>
-        <span class="nav-toggle-text">Menu</span>
-      </button>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">☰ Menu</button>
       <nav class="nav-links" id="siteNav">
         <a href="index.html">Home</a>
         <a href="tourism.html">Tourism</a>
         <a href="infrastructure.html">Infrastructure</a>
         <a href="investment.html">Investment</a>
         <a href="community.html">Community</a>
-        <a href="admin.html">Admin</a>
-        <a class="nav-cta" href="login.html">Login</a>
+        <a href="admin.html" data-admin-link>Admin</a>
       </nav>
+      <div class="nav-auth" id="authArea"></div>
     </div>
   </header>
 
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <h2>Admin Dashboard</h2>
-        <p>Review investor inquiries, approve services, and moderate jobs (demo).</p>
+        <h2>Admin dashboard</h2>
+        <p>Review inquiries, approve services, and manage job listings.</p>
       </div>
 
-      <div class="grid-4">
-        <div class="card">
-          <div class="card-body"><span class="badge">📩 Inquiries</span>
-            <h3 class="card-title">8 Pending</h3>
-            <p class="card-text">Need review & response</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body"><span class="badge">✅ Services</span>
-            <h3 class="card-title">5 Pending</h3>
-            <p class="card-text">Approve verified listings</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body"><span class="badge">🧹 Jobs</span>
-            <h3 class="card-title">3 Pending</h3>
-            <p class="card-text">Remove scams & duplicates</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body"><span class="badge">🗺️ Scores</span>
-            <h3 class="card-title">Update</h3>
-            <p class="card-text">Edit zone readiness</p>
-          </div>
-        </div>
-      </div>
+      <div id="adminStats"></div>
 
       <div style="height:18px"></div>
-
-      <h3 style="margin:0 0 10px">Investor Inquiries</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Interest</th>
-            <th>Zone</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>GreenWave Capital</td>
-            <td>Eco-lodges</td>
-            <td>Gitega</td>
-            <td><span class="pill warn">Pending</span></td>
-          </tr>
-          <tr>
-            <td>LakeSide Partners</td>
-            <td>Transport</td>
-            <td>Bujumbura</td>
-            <td><span class="pill warn">Pending</span></td>
-          </tr>
-          <tr>
-            <td>ConnectAfrica</td>
-            <td>Wi-Fi hotspots</td>
-            <td>Rutovu</td>
-            <td><span class="pill ok">Reviewed</span></td>
-          </tr>
-        </tbody>
-      </table>
+      <h3>Investor inquiries</h3>
+      <div id="adminInquiries"></div>
 
       <div style="height:18px"></div>
-
-      <h3 style="margin:0 0 10px">Services Approval</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Service</th>
-            <th>Owner</th>
-            <th>Location</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Local Driver</td>
-            <td>Jean P.</td>
-            <td>Bujumbura</td>
-            <td><span class="pill warn">Pending</span></td>
-          </tr>
-          <tr>
-            <td>Catering</td>
-            <td>Aline N.</td>
-            <td>Gitega</td>
-            <td><span class="pill ok">Approved</span></td>
-          </tr>
-          <tr>
-            <td>Crafts & Souvenirs</td>
-            <td>Coop Group</td>
-            <td>Gitega</td>
-            <td><span class="pill warn">Pending</span></td>
-          </tr>
-        </tbody>
-      </table>
+      <h3>Service approvals</h3>
+      <div id="adminServices"></div>
 
       <div style="height:18px"></div>
-
-      <h3 style="margin:0 0 10px">Jobs Moderation</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Job</th>
-            <th>Company</th>
-            <th>Location</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Tour Guide</td>
-            <td>TourCo</td>
-            <td>Bujumbura</td>
-            <td><span class="pill warn">Pending</span></td>
-          </tr>
-          <tr>
-            <td>Reception Assistant</td>
-            <td>Hotel Gitega</td>
-            <td>Gitega</td>
-            <td><span class="pill ok">Approved</span></td>
-          </tr>
-          <tr>
-            <td>Driver</td>
-            <td>ShuttlePro</td>
-            <td>Multiple</td>
-            <td><span class="pill bad">Flagged</span></td>
-          </tr>
-        </tbody>
-      </table>
-
+      <h3>Jobs moderation</h3>
+      <div id="adminJobs"></div>
     </div>
   </section>
 
   <footer class="footer">
     <div class="container footer-inner">© 2026 SIT Burundi</div>
   </footer>
-  <script src="script.js"></script>
+
+  <script src="data.js"></script>
+  <script src="storage.js"></script>
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
 </body>
 
 </html>

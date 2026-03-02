@@ -1,392 +1,432 @@
-// js/app.js
-// Main Application Logic
-
 function $(id) {
   return document.getElementById(id);
+}
+
+function average(values) {
+  if (!values.length) return 0;
+  return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+}
+
+function zoneScore(zone) {
+  return average([
+    zone.road,
+    zone.transport,
+    zone.ict,
+    zone.electricity,
+    zone.water,
+    zone.accommodation
+  ]);
+}
+
+function scorePill(score) {
+  if (score >= 75) return `<span class="pill ok">${score}/100 • Good</span>`;
+  if (score >= 50) return `<span class="pill warn">${score}/100 • Medium</span>`;
+  return `<span class="pill bad">${score}/100 • Low</span>`;
 }
 
 function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
-function nowISO() {
-  return new Date().toISOString();
+function esc(text) {
+  return String(text ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
-function uid(prefix = "id") {
-  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+function seedAppData() {
+  seedLS("jobs", seedJobs);
+  seedLS("services", seedServices);
+  seedLS("inquiries", []);
 }
 
-// -------------------- 1. TOURISM MODULE --------------------
-
-function renderDestinations(filter = {}) {
-  const container = $("destinations");
-  if (!container) return;
-
-  let data = destinations;
-
-  if (filter.search) {
-    const term = filter.search.toLowerCase();
-    data = data.filter(d => d.name.toLowerCase().includes(term) || d.description.toLowerCase().includes(term));
-  }
-  if (filter.region) {
-    data = data.filter(d => d.region === filter.region);
-  }
-  if (filter.category) {
-    data = data.filter(d => d.category.includes(filter.category)); // Loose match in case of multiple categories
-  }
-
-  container.innerHTML = data
-    .map(
-      (d) => `
-      <div class="card">
-        <div style="position:relative;">
-          <img src="${d.image}" alt="${d.name}" loading="lazy" style="height: 200px; width: 100%; object-fit: cover; border-radius: 8px 8px 0 0;">
-          <span style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.7); color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;">${d.region}</span>
-        </div>
-        <div class="card-content">
-          <h3>${d.name}</h3>
-          <p style="font-size:0.9rem; color:#666; margin-bottom:0.5rem;">${d.category}</p>
-          <p>${d.description.substring(0, 100)}...</p>
-          <a class="btn" style="margin-top:auto;" href="destination.html?id=${encodeURIComponent(d.id)}">View details</a>
-        </div>
-      </div>
-    `
-    )
-    .join("");
-
-  if (data.length === 0) {
-    container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-style: italic; color: #666;">No destinations found matching your criteria.</p>`;
-  }
+function setActiveNav() {
+  const page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+  document.querySelectorAll(".nav-links a").forEach((a) => {
+    const href = (a.getAttribute("href") || "").split("/").pop().toLowerCase();
+    if (href === page) a.classList.add("active");
+  });
 }
 
-window.filterDestinations = function () {
-  const search = $("searchDest").value;
-  const region = $("filterRegion").value;
-  const category = $("filterCategory").value;
-  renderDestinations({ search, region, category });
-};
+function setupNavToggle() {
+  const btn = document.querySelector(".nav-toggle");
+  const nav = document.getElementById("siteNav");
+  if (!btn || !nav) return;
 
-function renderDestinationDetails() {
-  const detailsBox = $("destinationDetails");
-  if (!detailsBox) return;
+  const setOpen = (open) => {
+    nav.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.textContent = open ? "✕ Close" : "☰ Menu";
+  };
+
+  btn.addEventListener("click", () => {
+    setOpen(!nav.classList.contains("open"));
+  });
+
+  nav.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => setOpen(false));
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 820) setOpen(false);
+  });
+}
+
+/* ---------- Tourism ---------- */
+function renderTourism() {
+  const list = $("tourismList");
+  const regionSelect = $("tourRegion");
+  const searchInput = $("tourSearch");
+  const categorySelect = $("tourCategory");
+  const mapBox = $("tourismMap");
+  if (!list || !regionSelect || !searchInput || !categorySelect) return;
+
+  const regions = [...new Set(destinations.map((d) => d.region))];
+  regionSelect.innerHTML = `<option value="all">All regions</option>` +
+    regions.map((r) => `<option value="${r}">${r}</option>`).join("");
+
+  let map;
+  let markersLayer;
+
+  if (mapBox && typeof L !== "undefined") {
+    map = L.map("tourismMap").setView([-3.35, 29.9], 7);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
+  }
+
+  function applyFilters() {
+    const q = searchInput.value.trim().toLowerCase();
+    const category = categorySelect.value;
+    const region = regionSelect.value;
+
+    const filtered = destinations.filter((d) => {
+      const matchQ =
+        !q ||
+        d.name.toLowerCase().includes(q) ||
+        d.description.toLowerCase().includes(q) ||
+        d.province.toLowerCase().includes(q) ||
+        d.region.toLowerCase().includes(q);
+      const matchCategory = category === "all" || d.category === category;
+      const matchRegion = region === "all" || d.region === region;
+      return matchQ && matchCategory && matchRegion;
+    });
+
+    list.innerHTML = filtered.length
+      ? filtered.map((d) => {
+        const zone = tourismZones.find((z) => z.id === d.zoneId);
+        const overall = zone ? zoneScore(zone) : 0;
+        return `
+            <article class="card">
+              <div class="cover">
+                <img src="${esc(d.image)}" alt="${esc(d.name)}" />
+              </div>
+              <div class="card-body">
+                <span class="badge">${esc(d.label)}</span>
+                <h3 class="card-title">${esc(d.name)}</h3>
+                <p class="card-text">${esc(d.description)}</p>
+                <div style="height:10px"></div>
+                <div class="muted">${esc(d.province)} • ${esc(d.region)}</div>
+                <div style="height:10px"></div>
+                ${scorePill(overall)}
+                <a class="card-link" href="destination.html?id=${encodeURIComponent(d.id)}">Open details →</a>
+              </div>
+            </article>
+          `;
+      }).join("")
+      : `<div class="empty">No destinations match your filters.</div>`;
+
+    if (markersLayer) {
+      markersLayer.clearLayers();
+      filtered.forEach((d) => {
+        const marker = L.marker([d.lat, d.lng]).addTo(markersLayer);
+        marker.bindPopup(`
+          <strong>${esc(d.name)}</strong><br />
+          ${esc(d.label)} • ${esc(d.province)}<br />
+          <a href="destination.html?id=${encodeURIComponent(d.id)}">Open details</a>
+        `);
+      });
+    }
+  }
+
+  searchInput.addEventListener("input", applyFilters);
+  categorySelect.addEventListener("change", applyFilters);
+  regionSelect.addEventListener("change", applyFilters);
+  applyFilters();
+}
+
+function renderDestination() {
+  const box = $("destinationDetails");
+  const mapBox = $("destinationMap");
+  if (!box) return;
 
   const id = getQueryParam("id");
-  const d = destinations.find((x) => x.id === id);
+  const d = destinations.find((item) => item.id === id);
 
   if (!d) {
-    detailsBox.innerHTML = `<p class="error">Destination not found.</p>`;
+    box.innerHTML = `<div class="empty">Destination not found.</div>`;
     return;
   }
 
-  // Calculate average locally since we don't have a helper for it yet
-  function averageScore(arr) {
-    if (!arr.length) return 0;
-    const sum = arr.reduce((a, b) => a + b, 0);
-    return Math.round(sum / arr.length);
-  }
+  const zone = tourismZones.find((z) => z.id === d.zoneId);
+  const overall = zone ? zoneScore(zone) : 0;
+  const related = investmentOpportunities.filter((item) => item.zoneId === d.zoneId);
 
-  const accessAvg = averageScore([d.access.road, d.access.transport, d.access.ict, d.access.utilities]);
-
-  detailsBox.innerHTML = `
-    <div class="card">
-       <img src="${d.image}" alt="${d.name}" style="height: 300px; width: 100%; object-fit: cover; border-radius: 8px;">
-       <div class="card-content">
-        <h2>${d.name}</h2>
-        <p><strong>Region:</strong> ${d.region}</p>
-        <p><strong>Category:</strong> ${d.category}</p>
-        <p>${d.description}</p>
-
-        <h3>Services</h3>
-        <ul>${d.services.map((s) => `<li>${s}</li>`).join("")}</ul>
-
-        <h3>Accessibility Readiness</h3>
-        <p><strong>Road:</strong> ${d.access.road}/100</p>
-        <p><strong>Transport:</strong> ${d.access.transport}/100</p>
-        <p><strong>ICT/Internet:</strong> ${d.access.ict}/100</p>
-        <p><strong>Utilities:</strong> ${d.access.utilities}/100</p>
-        <div class="score-badge">
-           <strong>Overall readiness:</strong> ${accessAvg}/100
+  box.innerHTML = `
+    <div class="grid-2">
+      <article class="card">
+        <div class="cover" style="height:280px">
+          <img src="${esc(d.image)}" alt="${esc(d.name)}" />
         </div>
-      </div>
+        <div class="card-body">
+          <span class="badge">${esc(d.label)}</span>
+          <h2 style="margin:10px 0 6px">${esc(d.name)}</h2>
+          <p class="muted">${esc(d.province)} • ${esc(d.region)}</p>
+          <p>${esc(d.description)}</p>
+          <h3>Available local services</h3>
+          <ul>
+            ${d.services.map((s) => `<li>${esc(s)}</li>`).join("")}
+          </ul>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <h3 style="margin-top:0">Infrastructure readiness</h3>
+          ${zone ? `
+            <div class="kpi-row">
+              <div class="stat"><strong>${zone.road}</strong><span>Roads</span></div>
+              <div class="stat"><strong>${zone.transport}</strong><span>Transport</span></div>
+              <div class="stat"><strong>${zone.ict}</strong><span>ICT</span></div>
+              <div class="stat"><strong>${zone.electricity}</strong><span>Power</span></div>
+            </div>
+            <div style="height:12px"></div>
+            ${scorePill(overall)}
+            <p><strong>Key gap:</strong> ${esc(zone.keyGap)}</p>
+            <p><strong>Recommendation:</strong> ${esc(zone.recommendation)}</p>
+          ` : `<p class="muted">No zone data available.</p>`}
+
+          <h3>Nearby investment opportunities</h3>
+          ${related.length
+      ? related.map((item) => `
+                <div class="mini-card">
+                  <strong>${esc(item.title)}</strong>
+                  <div class="muted">${esc(item.sector)} • ${esc(item.budget)}</div>
+                  <p>${esc(item.summary)}</p>
+                </div>
+              `).join("")
+      : `<p class="muted">No linked opportunities yet.</p>`
+    }
+
+          <a class="btn btn-secondary" href="tourism.html">← Back to tourism</a>
+        </div>
+      </article>
     </div>
   `;
 
-  if (typeof L !== "undefined") {
-    renderLeafletMap(d);
-  } else {
-    console.warn("Leaflet (L) is not loaded. Map will not be displayed.");
+  if (mapBox && typeof L !== "undefined") {
+    const map = L.map("destinationMap").setView([d.lat, d.lng], 10);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+    L.marker([d.lat, d.lng]).addTo(map).bindPopup(d.name).openPopup();
   }
 }
 
-function renderLeafletMap(destination) {
-  const mapBox = $("map");
-  if (!mapBox) return;
+/* ---------- Infrastructure ---------- */
+function exportZone(zoneId) {
+  const zone = tourismZones.find((z) => z.id === zoneId);
+  if (!zone) return;
 
-  const map = L.map("map").setView([destination.lat, destination.lng], 10);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
-
-  L.marker([destination.lat, destination.lng])
-    .addTo(map)
-    .bindPopup(`<b>${destination.name}</b><br>${destination.region}`)
-    .openPopup();
-}
-
-// -------------------- 2. INFRASTRUCTURE MODULE --------------------
-
-function averageScore(arr) {
-  if (!arr.length) return 0;
-  const sum = arr.reduce((a, b) => a + b, 0);
-  return Math.round(sum / arr.length);
-}
-
-function readinessLabel(score) {
-  if (score >= 75) return "Good";
-  if (score >= 50) return "Moderate";
-  return "Needs improvement";
-}
-
-function renderInfrastructure() {
-  const container = $("zones");
-  if (!container) return;
-  container.style.display = "block"; // Override grid layout
-
-  const getProgressBar = (val, color = "#088395") => `
-    <div style="background:#e0e0e0; border-radius:4px; height:8px; width:100%; margin-top:4px;">
-      <div style="background:${color}; height:8px; border-radius:4px; width:${val}%"></div>
-    </div>
-    <div style="font-size:0.75rem; color:#666; text-align:right;">${val}%</div>
-  `;
-
-  // Render as a responsive table/dashboard
-  container.innerHTML = `
-    <div class="card" style="overflow-x: auto; padding: 0;">
-      <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-        <thead>
-          <tr style="background: var(--secondary-color); color: white; text-align: left;">
-            <th style="padding: 1rem;">Zone / Region</th>
-            <th style="padding: 1rem;">Overall Score</th>
-            <th style="padding: 1rem;">Roads</th>
-            <th style="padding: 1rem;">ICT / Net</th>
-            <th style="padding: 1rem;">Power</th>
-            <th style="padding: 1rem;">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tourismZones.map(z => {
-    const overall = averageScore([z.road, z.transport, z.ict, z.electricity, z.water, z.accommodation]);
-    let badgeColor = overall >= 75 ? "#10b981" : overall >= 50 ? "#f59e0b" : "#ef4444";
-
-    return `
-            <tr style="border-bottom: 1px solid #eee;">
-              <td style="padding: 1rem; font-weight: 600;">${z.name}</td>
-              <td style="padding: 1rem;">
-                <span style="background:${badgeColor}; color:white; padding:4px 8px; border-radius:12px; font-size:0.85rem;">
-                  ${overall}/100
-                </span>
-              </td>
-              <td style="padding: 1rem; width: 15%;">${getProgressBar(z.road)}</td>
-              <td style="padding: 1rem; width: 15%;">${getProgressBar(z.ict, "#3b82f6")}</td>
-              <td style="padding: 1rem; width: 15%;">${getProgressBar(z.electricity, "#f59e0b")}</td>
-              <td style="padding: 1rem;">
-                <button class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" ${isAdmin() ? "" : "disabled"} onclick="exportZone('${z.id}')">
-                  Export
-                </button>
-              </td>
-            </tr>
-            `;
-  }).join("")}
-        </tbody>
-      </table>
-      ${!isAdmin() ? "<p style='padding:1rem; font-size:0.8rem; color:#666; text-align:center;'><em>Login as Admin to export full reports.</em></p>" : ""}
-    </div>
-    
-    <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-      <div class="card" style="text-align:center; padding: 2rem;">
-        <h3 style="font-size:2rem; color:var(--primary-color); margin-bottom:0.5rem;">${tourismZones.length}</h3>
-        <p>Monitored Zones</p>
-      </div>
-      <div class="card" style="text-align:center; padding: 2rem;">
-        <h3 style="font-size:2rem; color:#10b981; margin-bottom:0.5rem;">85%</h3>
-        <p>Avg Urban Readiness</p>
-      </div>
-      <div class="card" style="text-align:center; padding: 2rem;">
-        <h3 style="font-size:2rem; color:#f59e0b; margin-bottom:0.5rem;">62%</h3>
-        <p>Avg Rural Connectivity</p>
-      </div>
-    </div>
-  `;
-}
-
-window.exportZone = function (zoneId) {
-  if (!isAdmin()) {
-    alert("Access Denied: You must be an Administrator to export reports.");
-    return;
-  }
-
-  const z = tourismZones.find((x) => x.id === zoneId);
-  if (!z) return;
-
-  const overall = averageScore([z.road, z.transport, z.ict, z.electricity, z.water, z.accommodation]);
-
-  const text = `
-SMART TOURISM & INFRASTRUCTURE REPORT
--------------------------------------
-Zone: ${z.name}
-Date: ${new Date().toLocaleDateString()}
-Overall Readiness: ${overall}/100 (${readinessLabel(overall)})
-
-DETAILED SCORES:
-- Road Infrastructure: ${z.road}
-- Transport Availability: ${z.transport}
-- ICT / Internet: ${z.ict}
-- Electricity: ${z.electricity}
-- Water Supply: ${z.water}
-- Accommodation Capacity: ${z.accommodation}
-
-Generated by: Smart Infrastructure & Tourism Development Platform (MVP)
-  `.trim();
+  const text = [
+    "SIT BURUNDI - READINESS REPORT",
+    "-------------------------------",
+    `Zone: ${zone.name}`,
+    `Overall: ${zoneScore(zone)}/100`,
+    `Roads: ${zone.road}`,
+    `Transport: ${zone.transport}`,
+    `ICT: ${zone.ict}`,
+    `Electricity: ${zone.electricity}`,
+    `Water: ${zone.water}`,
+    `Accommodation: ${zone.accommodation}`,
+    `Key Gap: ${zone.keyGap}`,
+    `Recommendation: ${zone.recommendation}`
+  ].join("\n");
 
   const blob = new Blob([text], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${z.name.replace(/\s+/g, '_')}_Report.txt`;
+  a.download = `${zone.id}-readiness-report.txt`;
   a.click();
   URL.revokeObjectURL(url);
-};
-
-// -------------------- 3. INVESTMENT MODULE --------------------
-
-function getInquiries() {
-  return readLS("investor_inquiries", []);
 }
+
+function renderInfrastructure() {
+  const box = $("zones");
+  if (!box) return;
+
+  box.innerHTML = `
+    <div class="grid-4">
+      ${tourismZones.map((z) => `
+        <div class="card">
+          <div class="card-body">
+            <span class="badge">📍 ${esc(z.name)}</span>
+            <h3 class="card-title" style="margin-top:10px">${zoneScore(z)}/100</h3>
+            <p class="card-text"><strong>Key gap:</strong> ${esc(z.keyGap)}</p>
+            <p class="card-text">${esc(z.recommendation)}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+
+    <div style="height:18px"></div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Zone</th>
+          <th>Overall</th>
+          <th>Roads</th>
+          <th>ICT</th>
+          <th>Power</th>
+          <th>Export</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tourismZones.map((z) => `
+          <tr>
+            <td><strong>${esc(z.name)}</strong></td>
+            <td>${scorePill(zoneScore(z))}</td>
+            <td>${z.road}/100</td>
+            <td>${z.ict}/100</td>
+            <td>${z.electricity}/100</td>
+            <td>
+              <button class="btn btn-secondary btn-small" data-export-zone="${z.id}" ${!isAdmin() ? "disabled" : ""}>
+                Export
+              </button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+
+    ${!isAdmin() ? `<div class="notice">Login as Admin to export detailed reports.</div>` : ""}
+  `;
+
+  box.querySelectorAll("[data-export-zone]").forEach((btn) => {
+    btn.addEventListener("click", () => exportZone(btn.dataset.exportZone));
+  });
+}
+
+/* ---------- Investment ---------- */
+function getInquiries() {
+  return readLS("inquiries", []);
+}
+
 function saveInquiries(items) {
-  writeLS("investor_inquiries", items);
+  writeLS("inquiries", items);
 }
 
 function renderInvestment() {
   const box = $("investmentBox");
   if (!box) return;
-  box.style.display = "block"; // Override grid layout
 
   const user = getSession();
 
-  // Highlighted opportunities (could be dynamic later)
-  // Highlighted opportunities from data.js
-  const opportunitiesHtml = `
-    <div style="margin-bottom: 2rem;">
-      <h2 style="text-align:center; margin-bottom: 1.5rem; color: var(--primary-color);">Priority Investment Projects</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-        ${investmentOpportunities.map(inv => `
-          <div class="card" style="display:flex; flex-direction:column;">
-            <img src="${inv.image}" alt="${inv.title}" style="height:180px; width:100%; object-fit:cover; border-radius:8px 8px 0 0;">
-            <div class="card-content">
-              <h3>${inv.title}</h3>
-              <p style="font-size:0.9rem; color:#666; margin-bottom:0.5rem;">📍 ${inv.location} | 🏭 ${inv.sector}</p>
-              <p style="flex-grow:1; margin-bottom:1rem;">${inv.description}</p>
-              
-              <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:1rem; font-size:0.9rem;">
-                <p><strong>Impact:</strong> ${inv.expectedImpact}</p>
-                <p><strong>Est. ROI:</strong> ${inv.roi}</p>
-              </div>
-
-              <button class="btn" style="width:100%;" onclick="$('inqMessage').value='Inquiry regarding: ${inv.title}'; ('inqZone').scrollIntoView({behavior: 'smooth'});">
-                Request Prospectus
-              </button>
-            </div>
+  box.innerHTML = `
+    <div class="grid-2">
+      ${investmentOpportunities.map((item) => `
+        <article class="card">
+          <div class="card-body">
+            <span class="badge red">💼 ${esc(item.sector)}</span>
+            <h3 class="card-title" style="margin-top:10px">${esc(item.title)}</h3>
+            <p class="muted">${esc(item.location)} • ${esc(item.budget)}</p>
+            <p>${esc(item.summary)}</p>
+            <p><strong>Impact:</strong> ${esc(item.expectedImpact)}</p>
+            <p><strong>ROI:</strong> ${esc(item.roi)}</p>
           </div>
-        `).join("")}
+        </article>
+      `).join("")}
+    </div>
+  `;
+
+  if (!user) {
+    box.innerHTML += `<div class="notice">Login as an Investor to submit an inquiry.</div>`;
+    return;
+  }
+
+  if (!["Investor", "Admin"].includes(user.role)) {
+    box.innerHTML += `<div class="notice">You are logged in as ${user.role}. Only Investors can submit inquiries.</div>`;
+    return;
+  }
+
+  box.innerHTML += `
+    <div style="height:20px"></div>
+    <div class="card">
+      <div class="card-body">
+        <h3 style="margin-top:0">Submit an investment inquiry</h3>
+        <form id="inquiryForm" class="form-grid">
+          <select id="inqOpportunity" class="select" required>
+            <option value="">Choose an opportunity</option>
+            ${investmentOpportunities.map((i) => `<option value="${i.id}">${i.title}</option>`).join("")}
+          </select>
+          <select id="inqZone" class="select" required>
+            <option value="">Choose a target zone</option>
+            ${tourismZones.map((z) => `<option value="${z.id}">${z.name}</option>`).join("")}
+          </select>
+          <textarea id="inqMessage" class="textarea" required placeholder="Write your proposal or interest..."></textarea>
+          <button class="btn btn-primary" type="submit">Submit inquiry</button>
+        </form>
       </div>
     </div>
   `;
 
-  // Inquiry Form
-  const inquiryFormHtml = `
-    <div class="card">
-      <h3>Submit an Investor Inquiry</h3>
-      <form id="inquiryForm">
-        <div style="margin-bottom: 10px;">
-            <label style="display:block; margin-bottom: 5px;">Target Zone</label>
-            <select id="inqZone" required style="width: 100%; padding: 8px;">
-            ${tourismZones.map(z => `<option value="${z.name}">${z.name}</option>`).join("")}
-            </select>
-        </div>
+  const form = $("inquiryForm");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-        <div style="margin-bottom: 10px;">
-            <label style="display:block; margin-bottom: 5px;">Investment Type</label>
-            <select id="inqType" required style="width: 100%; padding: 8px;">
-            <option value="Hospitality (Hotel/Lodge)">Hospitality (Hotel/Lodge)</option>
-            <option value="Transport Services">Transport Services</option>
-            <option value="ICT / Digital Services">ICT / Digital Services</option>
-            <option value="Community Enterprise">Community Enterprise</option>
-            </select>
-        </div>
+    const items = getInquiries();
+    const opportunity = investmentOpportunities.find((i) => i.id === $("inqOpportunity").value);
+    const zone = tourismZones.find((z) => z.id === $("inqZone").value);
 
-        <div style="margin-bottom: 10px;">
-            <label style="display:block; margin-bottom: 5px;">Message / Proposal</label>
-            <textarea id="inqMessage" required placeholder="Describe your investment interest..." style="width: 100%; padding: 8px; height: 100px;"></textarea>
-        </div>
+    items.unshift({
+      id: `inq-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      status: "Pending",
+      investorName: user.name,
+      investorEmail: user.email,
+      opportunityId: opportunity?.id || "",
+      opportunityTitle: opportunity?.title || "",
+      zoneId: zone?.id || "",
+      zoneName: zone?.name || "",
+      message: $("inqMessage").value.trim()
+    });
 
-        <button class="btn" type="submit">Submit Inquiry</button>
-      </form>
-    </div>
-  `;
-
-  const roleNote = !user
-    ? `<div class="card"><p><em>Please <a href="login.html">login</a> to submit an inquiry.</em></p></div>`
-    : (user.role !== "Investor" && user.role !== "Admin")
-      ? `<div class="card"><p><em>You are logged in as <strong>${user.role}</strong>. Only <strong>Investors</strong> can submit inquiries.</em></p></div>`
-      : "";
-
-  box.innerHTML = opportunitiesHtml + roleNote;
-
-  if (user && (user.role === "Investor" || user.role === "Admin")) {
-    box.innerHTML += inquiryFormHtml;
-
-    // Attach event listener after adding to DOM
-    setTimeout(() => {
-      const form = $("inquiryForm");
-      if (form) {
-        form.addEventListener("submit", (e) => {
-          e.preventDefault();
-
-          const items = getInquiries();
-          items.unshift({
-            id: uid("inq"),
-            createdAt: nowISO(),
-            status: "New",
-            investorName: user.name,
-            investorEmail: user.email,
-            zone: $("inqZone").value,
-            type: $("inqType").value,
-            message: $("inqMessage").value.trim()
-          });
-          saveInquiries(items);
-
-          alert("Thank you! Your inquiry has been submitted to the Ministry/Admin.");
-          form.reset();
-        });
-      }
-    }, 0);
-  }
+    saveInquiries(items);
+    form.reset();
+    alert("Inquiry submitted successfully.");
+  });
 }
 
-// -------------------- 4. COMMUNITY & JOBS MODULE --------------------
-
+/* ---------- Community ---------- */
 function getServices() {
-  return readLS("community_services", []);
+  return readLS("services", []);
 }
+
 function saveServices(items) {
-  writeLS("community_services", items);
+  writeLS("services", items);
 }
 
 function getJobs() {
   return readLS("jobs", []);
 }
+
 function saveJobs(items) {
   writeLS("jobs", items);
 }
@@ -396,292 +436,379 @@ function renderCommunity() {
   if (!box) return;
 
   const user = getSession();
-  const services = getServices();
+  const services = getServices().filter((s) => s.status === "Approved");
   const jobs = getJobs();
 
-  // Public services list = only Approved
-  const approvedServices = services.filter(s => s.status === "Approved");
-
-  const servicesListHtml = `
-    <div class="card">
-      <h3>Local Services & SMEs</h3>
-      ${approvedServices.length === 0 ? "<p><em>No listed services yet. Be the first!</em></p>" : ""}
-      ${approvedServices.map(s => `
-        <div class="mini-card">
-          <h4>${s.businessName} <span style="font-size:0.8em; font-weight:normal; color:#666;">(${s.category})</span></h4>
-          <p><strong>Location:</strong> ${s.location}</p>
-          <p>${s.description}</p>
-          <p><strong>Contact:</strong> ${s.contact}</p>
+  box.innerHTML = `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-body">
+          <span class="badge">🧩 Local services</span>
+          <div style="height:12px"></div>
+          ${services.length
+      ? services.map((s) => `
+                <div class="mini-card">
+                  <strong>${esc(s.businessName)}</strong>
+                  <div class="muted">${esc(s.category)} • ${esc(s.location)}</div>
+                  <p>${esc(s.description)}</p>
+                  <div class="muted">Contact: ${esc(s.contact)}</div>
+                </div>
+              `).join("")
+      : `<div class="empty">No approved services yet.</div>`
+    }
         </div>
-        <hr>
-      `).join("")}
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <span class="badge">💼 Jobs</span>
+          <div style="height:12px"></div>
+          ${jobs.length
+      ? jobs.map((j) => `
+                <div class="mini-card">
+                  <strong>${esc(j.title)}</strong>
+                  <div class="muted">${esc(j.company)} • ${esc(j.location)} • ${esc(j.type)}</div>
+                  <p>${esc(j.description)}</p>
+                  <button class="btn btn-secondary btn-small" type="button" data-apply="${esc(j.applyContact)}">Apply</button>
+                </div>
+              `).join("")
+      : `<div class="empty">No jobs posted yet.</div>`
+    }
+        </div>
+      </div>
     </div>
   `;
 
-  // Public jobs list
-  const jobsListHtml = `
-    <div class="card">
-      <h3>Jobs & Opportunities</h3>
-      ${jobs.length === 0 ? "<p><em>No jobs posted yet.</em></p>" : ""}
-      ${jobs.map(j => `
-        <div class="mini-card">
-          <h4>${j.title} <span style="font-size:0.8em; font-weight:normal; color:#666;">at ${j.company}</span></h4>
-          <p><strong>Location:</strong> ${j.location} | <strong>Type:</strong> ${j.type}</p>
-          <p>${j.description}</p>
-          <button class="btn-small" onclick="alert('To apply, contact: ${j.applyContact}')">Apply Now</button>
-        </div>
-        <hr>
-      `).join("")}
-    </div>
-  `;
+  box.querySelectorAll("[data-apply]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      alert(`Apply using: ${btn.dataset.apply}`);
+    });
+  });
 
-  box.innerHTML = servicesListHtml + jobsListHtml;
-
-  // Render Forms based on Role
   if (!user) {
-    box.innerHTML += `<div class="card"><p><em><a href="login.html">Login</a> to register your business or view admin tools.</em></p></div>`;
+    box.innerHTML += `<div class="notice">Login as a Community user to submit your business.</div>`;
     return;
   }
 
-  // Community Member: Register Service
-  if (user.role === "Community" || user.role === "Admin") {
-    const serviceFormHtml = `
+  if (["Community", "Admin"].includes(user.role)) {
+    box.innerHTML += `
+      <div style="height:20px"></div>
       <div class="card">
-        <h3>Register Your Business (SME)</h3>
-        <form id="serviceForm">
-          <input id="svcName" required placeholder="Business Name" style="width:100%; margin-bottom:10px; padding:8px;" />
-          
-          <select id="svcCategory" required style="width:100%; margin-bottom:10px; padding:8px;">
-            <option value="Guiding">Guiding & Tours</option>
-            <option value="Accommodation">Accommodation (Guesthouse/Homestay)</option>
-            <option value="Food & Restaurant">Food & Restaurant</option>
-            <option value="Transport">Transport</option>
-            <option value="Arts & Crafts">Arts & Crafts</option>
-          </select>
-
-          <input id="svcLocation" required placeholder="Location" style="width:100%; margin-bottom:10px; padding:8px;" />
-          
-          <textarea id="svcDesc" required placeholder="Description of services..." style="width:100%; margin-bottom:10px; padding:8px;"></textarea>
-          
-          <input id="svcContact" required placeholder="Contact Phone/Email" style="width:100%; margin-bottom:10px; padding:8px;" />
-
-          <button class="btn" type="submit">Submit for Approval</button>
-        </form>
+        <div class="card-body">
+          <h3 style="margin-top:0">Register your local service</h3>
+          <form id="serviceForm" class="form-grid">
+            <input id="svcName" class="input" required placeholder="Business name" />
+            <select id="svcCategory" class="select" required>
+              <option value="">Choose category</option>
+              <option>Guiding</option>
+              <option>Transport</option>
+              <option>Accommodation</option>
+              <option>Food & Restaurant</option>
+              <option>Arts & Crafts</option>
+            </select>
+            <input id="svcLocation" class="input" required placeholder="Location" />
+            <input id="svcContact" class="input" required placeholder="Phone or email" />
+            <textarea id="svcDesc" class="textarea" required placeholder="Describe your service..."></textarea>
+            <button class="btn btn-primary" type="submit">Submit for approval</button>
+          </form>
+        </div>
       </div>
     `;
-    box.innerHTML += serviceFormHtml;
 
-    setTimeout(() => {
-      const sf = $("serviceForm");
-      if (sf) {
-        sf.addEventListener("submit", (e) => {
-          e.preventDefault();
-          const items = getServices();
-          items.unshift({
-            id: uid("svc"),
-            createdAt: nowISO(),
-            status: "Pending",
-            ownerName: user.name,
-            ownerEmail: user.email,
-            businessName: $("svcName").value.trim(),
-            category: $("svcCategory").value,
-            location: $("svcLocation").value.trim(),
-            description: $("svcDesc").value.trim(),
-            contact: $("svcContact").value.trim()
-          });
-          saveServices(items);
-          alert("Service submitted! It will appear after Admin approval.");
-          sf.reset();
-          renderCommunity(); // Re-render to show update (though it won't show in list until approved)
-        });
-      }
-    }, 0);
+    $("serviceForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const items = getServices();
+      items.unshift({
+        id: `svc-${Date.now()}`,
+        ownerName: user.name,
+        ownerEmail: user.email,
+        businessName: $("svcName").value.trim(),
+        category: $("svcCategory").value,
+        location: $("svcLocation").value.trim(),
+        description: $("svcDesc").value.trim(),
+        contact: $("svcContact").value.trim(),
+        status: "Pending",
+        createdAt: new Date().toISOString()
+      });
+      saveServices(items);
+      alert("Service submitted. It will appear after Admin approval.");
+      $("serviceForm").reset();
+    });
   }
 
-  // Admin: Post Jobs
   if (user.role === "Admin") {
-    const jobFormHtml = `
+    box.innerHTML += `
+      <div style="height:20px"></div>
       <div class="card">
-        <h3>[Admin] Post a Job</h3>
-        <form id="jobForm">
-          <input id="jobTitle" required placeholder="Job Title" style="width:100%; margin-bottom:10px; padding:8px;" />
-          <input id="jobCompany" required placeholder="Company" style="width:100%; margin-bottom:10px; padding:8px;" />
-          <input id="jobLocation" required placeholder="Location" style="width:100%; margin-bottom:10px; padding:8px;" />
-          
-          <select id="jobType" required style="width:100%; margin-bottom:10px; padding:8px;">
-            <option value="Internship">Internship</option>
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Contract">Contract</option>
-          </select>
-
-          <textarea id="jobDesc" required placeholder="Job Description..." style="width:100%; margin-bottom:10px; padding:8px;"></textarea>
-          <input id="jobApply" required placeholder="How to Apply (Email/Phone)" style="width:100%; margin-bottom:10px; padding:8px;" />
-
-          <button class="btn" type="submit">Post Job</button>
-        </form>
+        <div class="card-body">
+          <h3 style="margin-top:0">[Admin] Post a job</h3>
+          <form id="jobForm" class="form-grid">
+            <input id="jobTitle" class="input" required placeholder="Job title" />
+            <input id="jobCompany" class="input" required placeholder="Company" />
+            <input id="jobLocation" class="input" required placeholder="Location" />
+            <select id="jobType" class="select" required>
+              <option value="">Choose type</option>
+              <option>Internship</option>
+              <option>Part-time</option>
+              <option>Full-time</option>
+              <option>Contract</option>
+            </select>
+            <input id="jobApply" class="input" required placeholder="Apply contact" />
+            <textarea id="jobDesc" class="textarea" required placeholder="Job description..."></textarea>
+            <button class="btn btn-primary" type="submit">Post job</button>
+          </form>
+        </div>
       </div>
     `;
 
-    box.innerHTML += jobFormHtml;
-
-    setTimeout(() => {
-      const jf = $("jobForm");
-      if (jf) {
-        jf.addEventListener("submit", (e) => {
-          e.preventDefault();
-          const items = getJobs();
-          items.unshift({
-            id: uid("job"),
-            createdAt: nowISO(),
-            title: $("jobTitle").value.trim(),
-            company: $("jobCompany").value.trim(),
-            location: $("jobLocation").value.trim(),
-            type: $("jobType").value,
-            description: $("jobDesc").value.trim(),
-            applyContact: $("jobApply").value.trim()
-          });
-          saveJobs(items);
-          alert("Job posted successfully!");
-          jf.reset();
-          renderCommunity();
-        });
-      }
-    }, 0);
+    $("jobForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const items = getJobs();
+      items.unshift({
+        id: `job-${Date.now()}`,
+        title: $("jobTitle").value.trim(),
+        company: $("jobCompany").value.trim(),
+        location: $("jobLocation").value.trim(),
+        type: $("jobType").value,
+        description: $("jobDesc").value.trim(),
+        applyContact: $("jobApply").value.trim(),
+        createdAt: new Date().toISOString()
+      });
+      saveJobs(items);
+      alert("Job posted.");
+      $("jobForm").reset();
+    });
   }
 }
 
-// -------------------- 5. ADMIN PANEL --------------------
+/* ---------- Admin ---------- */
+function setInquiryStatus(id, status) {
+  const items = getInquiries();
+  const target = items.find((x) => x.id === id);
+  if (!target) return;
+  target.status = status;
+  saveInquiries(items);
+  renderAdmin();
+}
 
-function renderAdminPanel() {
+function setServiceStatus(id, status) {
+  const items = getServices();
+  const target = items.find((x) => x.id === id);
+  if (!target) return;
+  target.status = status;
+  saveServices(items);
+  renderAdmin();
+}
+
+function deleteJob(id) {
+  const items = getJobs().filter((x) => x.id !== id);
+  saveJobs(items);
+  renderAdmin();
+}
+
+function renderAdmin() {
+  const stats = $("adminStats");
   const inqBox = $("adminInquiries");
   const svcBox = $("adminServices");
   const jobBox = $("adminJobs");
-  if (!inqBox && !svcBox && !jobBox) return;
+  if (!inqBox || !svcBox || !jobBox) return;
 
   const user = requireAuth(["Admin"]);
   if (!user) return;
 
-  // Helper Table Structure
-  const createTable = (headers, rowsHtml) => `
-    <div style="overflow-x:auto;">
-      <table style="width:100%; border-collapse:collapse; min-width:600px;">
-        <thead>
-          <tr style="background:#f1f5f9; text-align:left;">
-            ${headers.map(h => `<th style="padding:1rem; border-bottom:2px solid #e2e8f0;">${h}</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml || '<tr><td colspan="' + headers.length + '" style="padding:1rem; text-align:center;">No data found.</td></tr>'}
-        </tbody>
-      </table>
-    </div>
+  const inquiries = getInquiries();
+  const services = getServices();
+  const jobs = getJobs();
+
+  if (stats) {
+    stats.innerHTML = `
+      <div class="grid-4">
+        <div class="card"><div class="card-body"><span class="badge">📩 Inquiries</span><h3 class="card-title">${inquiries.filter((i) => i.status === "Pending").length} Pending</h3></div></div>
+        <div class="card"><div class="card-body"><span class="badge">✅ Services</span><h3 class="card-title">${services.filter((s) => s.status === "Pending").length} Pending</h3></div></div>
+        <div class="card"><div class="card-body"><span class="badge">💼 Jobs</span><h3 class="card-title">${jobs.length} Active</h3></div></div>
+        <div class="card"><div class="card-body"><span class="badge">🗺️ Zones</span><h3 class="card-title">${tourismZones.length} Tracked</h3></div></div>
+      </div>
+    `;
+  }
+
+  inqBox.innerHTML = `
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Investor</th>
+          <th>Opportunity</th>
+          <th>Zone</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${inquiries.length
+      ? inquiries.map((i) => `
+              <tr>
+                <td>${new Date(i.createdAt).toLocaleDateString()}</td>
+                <td><strong>${esc(i.investorName)}</strong><br><span class="muted">${esc(i.investorEmail)}</span></td>
+                <td>${esc(i.opportunityTitle)}</td>
+                <td>${esc(i.zoneName)}</td>
+                <td>${scorePill(i.status === "Pending" ? 60 : 80)}</td>
+                <td>
+                  <button class="btn btn-secondary btn-small" data-read="${i.id}">Mark read</button>
+                </td>
+              </tr>
+            `).join("")
+      : `<tr><td colspan="6"><div class="empty">No inquiries yet.</div></td></tr>`
+    }
+      </tbody>
+    </table>
   `;
 
-  // Inquiries
-  const inquiries = getInquiries();
-  inqBox.innerHTML = createTable(
-    ["Date", "Status", "Investor", "Interest", "Message", "Actions"],
-    inquiries.map(i => `
-      <tr style="border-bottom:1px solid #e2e8f0;">
-        <td style="padding:1rem;">${new Date(i.createdAt).toLocaleDateString()}</td>
-        <td style="padding:1rem;"><span style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:${i.status === 'New' ? '#fee2e2; color:#b91c1c' : '#dcfce7; color:#15803d'}">${i.status}</span></td>
-        <td style="padding:1rem;"><strong>${i.investorName}</strong><br><span style="font-size:0.8rem; color:#666;">${i.investorEmail}</span></td>
-        <td style="padding:1rem;">${i.zone}<br><span style="font-size:0.8rem;">${i.type}</span></td>
-        <td style="padding:1rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${i.message}">${i.message}</td>
-        <td style="padding:1rem;">
-           <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem;" onclick="setInquiryStatus('${i.id}', 'Read')">Read</button>
-        </td>
-      </tr>
-    `).join("")
-  );
-
-  // Services
-  const services = getServices();
-  svcBox.innerHTML = createTable(
-    ["Business Name", "Owner", "Category", "Location", "Status", "Actions"],
-    services.map(s => `
-      <tr style="border-bottom:1px solid #e2e8f0;">
-        <td style="padding:1rem;"><strong>${s.businessName}</strong></td>
-        <td style="padding:1rem;">${s.ownerName}</td>
-        <td style="padding:1rem;">${s.category}</td>
-        <td style="padding:1rem;">${s.location}</td>
-        <td style="padding:1rem;"><span style="background:${s.status === 'Pending' ? '#ffedd5' : '#dbeafe'}; padding:4px 8px; border-radius:4px; font-size:0.8rem;">${s.status}</span></td>
-        <td style="padding:1rem; display:flex; gap:5px;">
-          <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem; background:#10b981;" onclick="setServiceStatus('${s.id}', 'Approved')">✓</button>
-          <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem; background:#ef4444;" onclick="setServiceStatus('${s.id}', 'Rejected')">✗</button>
-        </td>
-      </tr>
-    `).join("")
-  );
-
-  // Jobs
-  const jobs = getJobs();
-  jobBox.innerHTML = createTable(
-    ["Title", "Company", "Type", "Location", "Posted", "Actions"],
-    jobs.map(j => `
-      <tr style="border-bottom:1px solid #e2e8f0;">
-        <td style="padding:1rem;"><strong>${j.title}</strong></td>
-        <td style="padding:1rem;">${j.company}</td>
-        <td style="padding:1rem;">${j.type}</td>
-        <td style="padding:1rem;">${j.location}</td>
-        <td style="padding:1rem;">${new Date(j.createdAt).toLocaleDateString()}</td>
-        <td style="padding:1rem;">
-          <button class="btn" style="padding:0.2rem 0.6rem; font-size:0.8rem; background:#ef4444;" onclick="deleteJob('${j.id}')">Delete</button>
-        </td>
-      </tr>
-    `).join("")
-  );
-}
-
-// Admin Actions (Global)
-window.setInquiryStatus = function (id, status) {
-  const items = getInquiries();
-  const idx = items.findIndex(x => x.id === id);
-  if (idx < 0) return;
-  items[idx].status = status;
-  saveInquiries(items);
-  renderAdminPanel();
-};
-
-window.setServiceStatus = function (id, status) {
-  const items = getServices();
-  const idx = items.findIndex(x => x.id === id);
-  if (idx < 0) return;
-  items[idx].status = status;
-  saveServices(items);
-  renderAdminPanel();
-};
-
-window.deleteJob = function (id) {
-  const items = getJobs().filter(j => j.id !== id);
-  saveJobs(items);
-  renderAdminPanel();
-};
-
-// -------------------- MAIN BOOTSTRAP --------------------
-
-function hideAdminLinkIfNeeded() {
-  const user = getSession();
-  const adminLinks = document.querySelectorAll('a[href="admin.html"]');
-  adminLinks.forEach(link => {
-    if (!user || user.role !== "Admin") {
-      link.style.display = "none";
-    } else {
-      link.style.display = "inline-block";
+  svcBox.innerHTML = `
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Business</th>
+          <th>Owner</th>
+          <th>Category</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${services.length
+      ? services.map((s) => `
+              <tr>
+                <td>${esc(s.businessName)}</td>
+                <td>${esc(s.ownerName)}</td>
+                <td>${esc(s.category)}</td>
+                <td>${esc(s.location)}</td>
+                <td>${esc(s.status)}</td>
+                <td class="actions">
+                  <button class="btn btn-secondary btn-small" data-approve="${s.id}">Approve</button>
+                  <button class="btn btn-secondary btn-small danger" data-reject="${s.id}">Reject</button>
+                </td>
+              </tr>
+            `).join("")
+      : `<tr><td colspan="6"><div class="empty">No service submissions yet.</div></td></tr>`
     }
+      </tbody>
+    </table>
+  `;
+
+  jobBox.innerHTML = `
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>Company</th>
+          <th>Type</th>
+          <th>Location</th>
+          <th>Posted</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${jobs.length
+      ? jobs.map((j) => `
+              <tr>
+                <td>${esc(j.title)}</td>
+                <td>${esc(j.company)}</td>
+                <td>${esc(j.type)}</td>
+                <td>${esc(j.location)}</td>
+                <td>${new Date(j.createdAt).toLocaleDateString()}</td>
+                <td><button class="btn btn-secondary btn-small danger" data-delete-job="${j.id}">Delete</button></td>
+              </tr>
+            `).join("")
+      : `<tr><td colspan="6"><div class="empty">No jobs yet.</div></td></tr>`
+    }
+      </tbody>
+    </table>
+  `;
+
+  inqBox.querySelectorAll("[data-read]").forEach((btn) => {
+    btn.addEventListener("click", () => setInquiryStatus(btn.dataset.read, "Read"));
+  });
+
+  svcBox.querySelectorAll("[data-approve]").forEach((btn) => {
+    btn.addEventListener("click", () => setServiceStatus(btn.dataset.approve, "Approved"));
+  });
+
+  svcBox.querySelectorAll("[data-reject]").forEach((btn) => {
+    btn.addEventListener("click", () => setServiceStatus(btn.dataset.reject, "Rejected"));
+  });
+
+  jobBox.querySelectorAll("[data-delete-job]").forEach((btn) => {
+    btn.addEventListener("click", () => deleteJob(btn.dataset.deleteJob));
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateNavAuthUI();
-  hideAdminLinkIfNeeded();
+/* ---------- Login / Register ---------- */
+function setupLoginForm() {
+  const form = $("loginForm");
+  if (!form) return;
 
-  // Check which page we are on and render appropriate content
-  if ($("destinations")) renderDestinations();
-  if ($("destinationDetails")) renderDestinationDetails();
-  if ($("zones")) renderInfrastructure();
-  if ($("investmentBox")) renderInvestment();
-  if ($("communityBox")) renderCommunity();
-  if ($("adminInquiries")) renderAdminPanel();
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const result = loginUser($("loginEmail").value, $("loginPassword").value);
+    const note = $("loginNote");
+
+    if (!result.ok) {
+      note.textContent = result.message;
+      note.className = "notice danger";
+      return;
+    }
+
+    window.location.href = result.user.role === "Admin" ? "admin.html" : "index.html";
+  });
+}
+
+function setupRegisterForm() {
+  const form = $("registerForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = $("regName").value.trim();
+    const email = $("regEmail").value.trim();
+    const password = $("regPassword").value;
+    const role = $("regRole").value;
+    const note = $("registerNote");
+
+    if (password.length < 6) {
+      note.textContent = "Password must be at least 6 characters.";
+      note.className = "notice danger";
+      return;
+    }
+
+    const result = registerUser({ name, email, password, role });
+
+    if (!result.ok) {
+      note.textContent = result.message;
+      note.className = "notice danger";
+      return;
+    }
+
+    window.location.href = role === "Admin" ? "admin.html" : "index.html";
+  });
+}
+
+/* ---------- Boot ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  ensureSeedUsers();
+  seedAppData();
+  renderAuthArea();
+  updateAdminLinks();
+  setActiveNav();
+  setupNavToggle();
+
+  renderTourism();
+  renderDestination();
+  renderInfrastructure();
+  renderInvestment();
+  renderCommunity();
+  renderAdmin();
+  setupLoginForm();
+  setupRegisterForm();
 });

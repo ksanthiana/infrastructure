@@ -3,99 +3,49 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Investment — SIT Burundi</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-
     <header class="navbar">
         <div class="container navbar-inner">
             <a class="brand" href="index.html">
                 <div class="brand-badge"></div>
                 <div>SIT <span>Burundi</span></div>
             </a>
-            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
-                <span class="nav-toggle-icon" aria-hidden="true">☰</span>
-                <span class="nav-toggle-text">Menu</span>
-            </button>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">☰ Menu</button>
             <nav class="nav-links" id="siteNav">
                 <a href="index.html">Home</a>
                 <a href="tourism.html">Tourism</a>
                 <a href="infrastructure.html">Infrastructure</a>
                 <a href="investment.html">Investment</a>
                 <a href="community.html">Community</a>
-                <a href="admin.html">Admin</a>
-                <a class="nav-cta" href="login.html">Login</a>
+                <a href="admin.html" data-admin-link>Admin</a>
             </nav>
+            <div class="nav-auth" id="authArea"></div>
         </div>
     </header>
 
     <section class="section">
         <div class="container">
             <div class="section-header">
-                <h2>Investment Opportunities</h2>
-                <p>Projects that improve readiness and create jobs (demo). Submit inquiry via Admin.</p>
+                <h2>Investment opportunities</h2>
+                <p>Browse real opportunities and submit an inquiry as an Investor.</p>
             </div>
-
-            <div class="grid-3">
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge red">🏨 Hospitality</span>
-                        <h3 class="card-title">Eco-lodges & Small Hotels (Gitega)</h3>
-                        <p class="card-text">Increase accommodation for cultural events and visitors.</p>
-                        <a class="card-link" href="admin.html">Submit inquiry →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge">🚌 Transport</span>
-                        <h3 class="card-title">Tourist Shuttle Routes</h3>
-                        <p class="card-text">Reliable transport between destinations and towns.</p>
-                        <a class="card-link" href="admin.html">Submit inquiry →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge">📶 ICT</span>
-                        <h3 class="card-title">Wi-Fi Hotspots Near Sites</h3>
-                        <p class="card-text">Boost visitor experience and digital visibility.</p>
-                        <a class="card-link" href="admin.html">Submit inquiry →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge">♻️ Sustainability</span>
-                        <h3 class="card-title">Waste & Water Points</h3>
-                        <p class="card-text">Cleaner zones, safer water, higher tourism satisfaction.</p>
-                        <a class="card-link" href="admin.html">Submit inquiry →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge red">🧑‍🎓 Skills</span>
-                        <h3 class="card-title">Hospitality Training Program</h3>
-                        <p class="card-text">Train guides, hotel staff, and service providers.</p>
-                        <a class="card-link" href="admin.html">Submit inquiry →</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <span class="badge">🧭 Experiences</span>
-                        <h3 class="card-title">Tour Packages + Booking</h3>
-                        <p class="card-text">Standardize tours with reliable local operators.</p>
-                        <a class="card-link" href="admin.html">Submit inquiry →</a>
-                    </div>
-                </div>
-            </div>
+            <div id="investmentBox"></div>
         </div>
     </section>
 
     <footer class="footer">
         <div class="container footer-inner">© 2026 SIT Burundi</div>
     </footer>
-    <script src="script.js"></script>
+
+    <script src="data.js"></script>
+    <script src="storage.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>

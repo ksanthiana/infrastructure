@@ -1,52 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Destination Details | Smart Tourism Burundi</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css" />
-
-  <!-- Leaflet (OpenStreetMap) -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Destination Details — SIT Burundi</title>
+  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 
 <body>
-
-  <header>
-    <h1>Destination Details</h1>
-    <p>Tourism module — view details + map</p>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-badge"></div>
+        <div>SIT <span>Burundi</span></div>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">☰ Menu</button>
+      <nav class="nav-links" id="siteNav">
+        <a href="index.html">Home</a>
+        <a href="tourism.html">Tourism</a>
+        <a href="infrastructure.html">Infrastructure</a>
+        <a href="investment.html">Investment</a>
+        <a href="community.html">Community</a>
+        <a href="admin.html" data-admin-link>Admin</a>
+      </nav>
+      <div class="nav-auth" id="authArea"></div>
+    </div>
   </header>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="tourism.html">Tourism</a>
-    <a href="infrastructure.html">Infrastructure</a>
-    <a href="investment.html">Investment</a>
-    <a href="community.html">Community</a>
-    <a href="admin.html">Admin</a>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Destination details</h2>
+        <p>See the destination, map location, readiness, and nearby opportunities.</p>
+      </div>
 
-    <div id="authBox" class="authBox"></div>
-  </nav>
+      <div id="destinationDetails"></div>
 
-  <section id="destinationDetails"></section>
+      <div style="height:18px"></div>
 
-  <section class="card">
-    <h3>Map (OpenStreetMap)</h3>
-    <div id="map" style="height: 380px; border-radius: 12px;"></div>
+      <div class="map-shell">
+        <div id="destinationMap" class="map-frame"></div>
+      </div>
+    </div>
   </section>
 
-  <footer>
-    <p>© 2026 Kaze Ange Santhiana | ALU</p>
+  <footer class="footer">
+    <div class="container footer-inner">© 2026 SIT Burundi</div>
   </footer>
 
+  <script src="data.js"></script>
+  <script src="storage.js"></script>
+  <script src="auth.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <script src="js/data.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script src="app.js"></script>
+</body>
 
 </html>
