@@ -1,9 +1,9 @@
+// js/storage.js
+
 function readLS(key, fallback) {
   try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    const parsed = JSON.parse(raw);
-    return parsed ?? fallback;
+    const v = JSON.parse(localStorage.getItem(key));
+    return v ?? fallback;
   } catch {
     return fallback;
   }
@@ -11,10 +11,4 @@ function readLS(key, fallback) {
 
 function writeLS(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
-}
-
-function seedLS(key, value) {
-  if (!localStorage.getItem(key)) {
-    writeLS(key, value);
-  }
 }
