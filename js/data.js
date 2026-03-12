@@ -232,3 +232,7 @@ const seedServices = [
     createdAt: new Date().toISOString()
   }
 ];
+
+function averageScore(values) {
+  return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+}
