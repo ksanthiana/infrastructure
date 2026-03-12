@@ -48,7 +48,8 @@ function renderDestinationDetails() {
     return;
   }
 
-  const accessAvg = averageScore([d.access.road, d.access.transport, d.access.ict, d.access.utilities]);
+  const zone = tourismZones.find(z => z.id === d.zoneId) || {};
+  const accessAvg = averageScore([zone.road || 0, zone.transport || 0, zone.ict || 0, zone.electricity || 0, zone.water || 0, zone.accommodation || 0]);
 
   detailsBox.innerHTML = `
     <div class="card">
@@ -61,10 +62,10 @@ function renderDestinationDetails() {
       <ul>${d.services.map((s) => `<li>${s}</li>`).join("")}</ul>
 
       <h3>Accessibility Readiness</h3>
-      <p><strong>Road:</strong> ${d.access.road}/100</p>
-      <p><strong>Transport:</strong> ${d.access.transport}/100</p>
-      <p><strong>ICT/Internet:</strong> ${d.access.ict}/100</p>
-      <p><strong>Utilities:</strong> ${d.access.utilities}/100</p>
+      <p><strong>Road:</strong> ${zone.road || 0}/100</p>
+      <p><strong>Transport:</strong> ${zone.transport || 0}/100</p>
+      <p><strong>ICT/Internet:</strong> ${zone.ict || 0}/100</p>
+      <p><strong>Utilities:</strong> ${zone.electricity || 0}/100 (Electricity), ${zone.water || 0}/100 (Water)</p>
       <p><strong>Overall readiness:</strong> ${accessAvg}/100</p>
     </div>
   `;

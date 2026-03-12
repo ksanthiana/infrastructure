@@ -92,8 +92,8 @@ function requireAuth(allowedRoles = []) {
   return user;
 }
 
-function renderAuthArea() {
-  const authArea = document.getElementById("authArea");
+function updateNavAuthUI() {
+  const authArea = document.getElementById("authArea") || document.getElementById("authBox");
   if (!authArea) return;
 
   const user = getSession();
@@ -113,6 +113,11 @@ function renderAuthArea() {
 
   const btn = document.getElementById("logoutBtn");
   if (btn) btn.addEventListener("click", logout);
+}
+
+// Keep renderAuthArea for backwards compatibility if needed elsewhere
+function renderAuthArea() {
+  updateNavAuthUI();
 }
 
 function updateAdminLinks() {
