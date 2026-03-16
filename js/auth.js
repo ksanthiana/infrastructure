@@ -93,7 +93,8 @@ function requireAuth(allowedRoles = []) {
 }
 
 function updateNavAuthUI() {
-  const authArea = document.getElementById("authArea") || document.getElementById("authBox");
+  const authArea = document.getElementById("authArea");
+
   if (!authArea) return;
 
   const user = getSession();

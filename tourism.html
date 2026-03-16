@@ -1,45 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tourism | SIT Burundi</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tourism | SIT Burundi Smart Infrastructure & Tourism</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
 
-  <header>
-    <h1>Tourism Module</h1>
-    <p>Explore destinations and plan visits</p>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-badge"></div>
+        <div>SIT <span>Burundi</span></div>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
+        <span class="nav-toggle-icon" aria-hidden="true">☰</span>
+        <span class="nav-toggle-text">Menu</span>
+      </button>
+      <nav class="nav-links" id="siteNav">
+        <a href="index.html">Home</a>
+        <a href="tourism.html" class="active">Tourism</a>
+        <a href="infrastructure.html">Infrastructure</a>
+        <a href="investment.html">Investment</a>
+        <a href="community.html">Community</a>
+        <a href="admin.html" data-admin-link style="display:none;">Admin</a>
+      </nav>
+      <div class="nav-auth" id="authArea"></div>
+    </div>
   </header>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="tourism.html">Tourism</a>
-    <a href="infrastructure.html">Infrastructure</a>
-    <a href="investment.html">Investment</a>
-    <a href="community.html">Community</a>
-    <a href="admin.html">Admin</a>
-    <div id="authBox" class="authBox"></div>
-  </nav>
+  <section class="section">
+    <div class="container">
+      <div id="fitCheckOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+          <h2>Who are you?</h2>
+          <p>Tell us your journey type to unlock community-verified landmark routes and safe discovery modes.</p>
+          <div class="role-grid">
+            <button class="role-btn" onclick="setDiscoveryRole('Tourist')">
+              <span>🏞️ Tourist</span>
+            </button>
+            <button class="role-btn" onclick="setDiscoveryRole('Investor')">
+              <span>💼 Investor</span>
+            </button>
+            <button class="role-btn" onclick="setDiscoveryRole('Community')">
+              <span>🤝 Community</span>
+            </button>
+            <button class="role-btn" onclick="setDiscoveryRole('Guide')">
+              <span>🚩 Local Guide</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-  <section class="hero">
-    <h2>Tourism Map of Burundi</h2>
-    <p>Explore destinations and open full details.</p>
+      <div class="section-header">
+        <h2>Safe Browse Mode</h2>
+        <p>Explore destinations verified by local community knowledge.</p>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by province, landmark, or category..." oninput="handleSearch()">
+        <select id="roleFilter" class="search-input" style="max-width: 150px;" onchange="handleSearch()">
+          <option value="">All Categories</option>
+          <option value="lake">Lakes</option>
+          <option value="park">Parks</option>
+          <option value="culture">Culture</option>
+        </select>
+      </div>
+      
+      <div class="grid-3 cards" id="destinations"></div>
+    </div>
   </section>
 
-  <section class="cards" id="destinations"></section>
-
-  <footer>
-    <p>© 2026 SIT Burundi</p>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© 2026 SIT Burundi</p>
+    </div>
   </footer>
 
-  <script src="js/data.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/script.js" defer></script>
 </body>
-
 </html>

@@ -17,23 +17,73 @@ function uid(prefix = "id") {
 }
 
 // -------------------- Tourism --------------------
+function getDiscoveryRole() {
+  return sessionStorage.getItem("discoveryRole");
+}
+
+window.setDiscoveryRole = function(role) {
+  sessionStorage.setItem("discoveryRole", role);
+  const overlay = $("fitCheckOverlay");
+  if (overlay) overlay.style.display = "none";
+  renderDestinations();
+};
+
+window.handleSearch = function() {
+  renderDestinations();
+};
+
 function renderDestinations() {
   const container = $("destinations");
   if (!container) return;
 
-  container.innerHTML = destinations
+  const role = getDiscoveryRole();
+  const overlay = $("fitCheckOverlay");
+  
+  // Show Fit Check if no role selected and we are on tourism.html
+  if (!role && overlay) {
+    overlay.style.display = "flex";
+  }
+
+  const query = $("searchInput") ? $("searchInput").value.toLowerCase() : "";
+  const catFilter = $("roleFilter") ? $("roleFilter").value : "";
+
+  const filtered = destinations.filter(d => {
+    const matchesQuery = d.name.toLowerCase().includes(query) || 
+                         d.province.toLowerCase().includes(query) || 
+                         (d.landmarkDirections && d.landmarkDirections.toLowerCase().includes(query));
+    const matchesCat = !catFilter || d.category === catFilter;
+    
+    // Safety check: only show if the discovery role has visibility
+    const roleVisible = !role || (d.visibilityRoles && d.visibilityRoles.includes(role));
+    
+    return matchesQuery && matchesCat && roleVisible;
+  });
+
+  container.innerHTML = filtered
     .map(
       (d) => `
-      <div class="card">
-        <h3>${d.name}</h3>
-        <p><strong>Region:</strong> ${d.region}</p>
-        <p><strong>Category:</strong> ${d.category}</p>
-        <p>${d.description}</p>
-        <a class="btn" href="destination.html?id=${encodeURIComponent(d.id)}">View details</a>
+      <div class="card" data-tags="${d.category}">
+        <div class="cover">
+          <img src="${d.image}" alt="${d.name}">
+        </div>
+        <div class="card-body">
+          <div class="badge">${d.category.toUpperCase()}</div>
+          <h3 class="card-title" style="margin-top: 10px;">${d.name}</h3>
+          <p class="card-text"><strong>Region:</strong> ${d.region} (${d.province})</p>
+          <div class="verified-badge">✓ Verified by ${d.verifiedBy || 'Community'}</div>
+          <p class="card-text" style="margin-top: 10px;">${d.description}</p>
+          <a class="card-link" href="destination.html?id=${encodeURIComponent(d.id)}">Reveal safe route →</a>
+        </div>
       </div>
     `
     )
     .join("");
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+      <p>No destinations found matching your search or role safety constraints.</p>
+    </div>`;
+  }
 }
 
 function renderDestinationDetails() {
@@ -44,7 +94,7 @@ function renderDestinationDetails() {
   const d = destinations.find((x) => x.id === id);
 
   if (!d) {
-    detailsBox.innerHTML = `<p class="error">Destination not found.</p>`;
+    detailsBox.innerHTML = `<p class="error">Destination not found or restricted.</p>`;
     return;
   }
 
@@ -52,41 +102,40 @@ function renderDestinationDetails() {
   const accessAvg = averageScore([zone.road || 0, zone.transport || 0, zone.ict || 0, zone.electricity || 0, zone.water || 0, zone.accommodation || 0]);
 
   detailsBox.innerHTML = `
-    <div class="card">
-      <h2>${d.name}</h2>
-      <p><strong>Region:</strong> ${d.region}</p>
-      <p><strong>Category:</strong> ${d.category}</p>
-      <p>${d.description}</p>
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="cover" style="height: 280px;">
+        <img src="${d.image}" alt="${d.name}" style="height: 100%; width: 100%; object-fit: cover;">
+      </div>
+      <div class="card-body">
+        <div class="badge">${d.label || d.category}</div>
+        <div class="verified-badge" style="margin-left: 10px;">✓ Verified by ${d.verifiedBy}</div>
+        <h2 style="margin-top: 10px;">${d.name}</h2>
+        
+        <div class="landmark-info">
+          <strong>📍 Safe Discovery Route (Landmark-based):</strong><br>
+          ${d.landmarkDirections}
+        </div>
 
-      <h3>Services</h3>
-      <ul>${d.services.map((s) => `<li>${s}</li>`).join("")}</ul>
+        <p class="card-text" style="margin-top: 15px;">${d.description}</p>
 
-      <h3>Accessibility Readiness</h3>
-      <p><strong>Road:</strong> ${zone.road || 0}/100</p>
-      <p><strong>Transport:</strong> ${zone.transport || 0}/100</p>
-      <p><strong>ICT/Internet:</strong> ${zone.ict || 0}/100</p>
-      <p><strong>Utilities:</strong> ${zone.electricity || 0}/100 (Electricity), ${zone.water || 0}/100 (Water)</p>
-      <p><strong>Overall readiness:</strong> ${accessAvg}/100</p>
+        <h3 style="margin-top: 16px;">Community-Verified Services</h3>
+        <ul style="color: rgba(15, 23, 42, .7); padding-left: 20px; font-size: 13px;">${d.services.map((s) => `<li>${s}</li>`).join("")}</ul>
+
+        <h3 style="margin-top: 16px;">Infrastructure Readiness (Zone: ${zone.name || 'Unmapped'})</h3>
+        <p><strong>Overall readiness:</strong> ${accessAvg}/100</p>
+        <p class="muted">Note: We use landmark directions rather than exact GPS points to ensure community safety and accuracy where maps fail.</p>
+      </div>
     </div>
   `;
 
-  if (typeof L !== "undefined") renderLeafletMap(d);
+  // We are removing Leaflet maps to prioritize landmark-based discovery as per the pivot.
+  const mapBox = $("map");
+  if (mapBox) mapBox.style.display = "none";
 }
 
 function renderLeafletMap(destination) {
-  const mapBox = $("map");
-  if (!mapBox) return;
-
-  const map = L.map("map").setView([destination.lat, destination.lng], 10);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
-
-  L.marker([destination.lat, destination.lng])
-    .addTo(map)
-    .bindPopup(`<b>${destination.name}</b><br>${destination.region}`)
-    .openPopup();
+  // Disabled in favor of landmark-based routing
+  return;
 }
 
 // -------------------- Infrastructure --------------------
@@ -97,28 +146,64 @@ function readinessLabel(score) {
 }
 
 function renderInfrastructure() {
-  const container = $("zones");
-  if (!container) return;
+  const cardsContainer = $("infraCards");
+  const tableContainer = $("infraTableBody");
+  if (!cardsContainer || !tableContainer) return;
 
-  container.innerHTML = tourismZones
+  // 1. Calculate and render aggregate summary cards
+  const allRoad = tourismZones.map(z => z.road);
+  const allUtils = tourismZones.map(z => (z.electricity + z.water) / 2);
+  const allIct = tourismZones.map(z => z.ict);
+  const allAcc = tourismZones.map(z => z.accommodation);
+
+  const avg = (arr) => Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+
+  cardsContainer.innerHTML = `
+    <div class="card">
+      <div class="card-body"><span class="badge">🛣️ Roads</span>
+        <h3 class="card-title">${avg(allRoad)}/100</h3>
+        <p class="card-text">Average access quality across community-verified routes.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body"><span class="badge">💧 Utilities</span>
+        <h3 class="card-title">${avg(allUtils)}/100</h3>
+        <p class="card-text">Power and water reliability in mapped tourism zones.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body"><span class="badge">📶 ICT</span>
+        <h3 class="card-title">${avg(allIct)}/100</h3>
+        <p class="card-text">Network coverage and community hotspot availability.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body"><span class="badge">🏠 Stays</span>
+        <h3 class="card-title">${avg(allAcc)}/100</h3>
+        <p class="card-text">Accommodation readiness for visitors and investors.</p>
+      </div>
+    </div>
+  `;
+
+  // 2. Render the detailed table
+  tableContainer.innerHTML = tourismZones
     .map((z) => {
       const overall = averageScore([z.road, z.transport, z.ict, z.electricity, z.water, z.accommodation]);
-      return `
-        <div class="card">
-          <h3>${z.name}</h3>
-          <p><strong>Overall readiness:</strong> ${overall}/100 (${readinessLabel(overall)})</p>
-          <p>Road: ${z.road}/100</p>
-          <p>Transport: ${z.transport}/100</p>
-          <p>ICT: ${z.ict}/100</p>
-          <p>Electricity: ${z.electricity}/100</p>
-          <p>Water: ${z.water}/100</p>
-          <p>Accommodation: ${z.accommodation}/100</p>
+      const statusClass = overall >= 75 ? "ok" : (overall >= 50 ? "warn" : "bad");
+      const statusLabel = readinessLabel(overall);
 
-          <button class="btn" ${isAdmin() ? "" : "disabled"} onclick="exportZone('${z.id}')">
-            Export mini report
-          </button>
-          ${isAdmin() ? "" : "<p><em>Login as Admin to export reports.</em></p>"}
-        </div>
+      return `
+        <tr>
+          <td><strong>${z.name}</strong></td>
+          <td><span class="pill ${statusClass}">${overall}/100 • ${statusLabel}</span></td>
+          <td>${z.keyGap}</td>
+          <td>${z.recommendation}</td>
+          <td>
+            <button class="btn btn-small" ${isAdmin() ? "" : "disabled"} onclick="exportZone('${z.id}')">
+              Export
+            </button>
+          </td>
+        </tr>
       `;
     })
     .join("");
@@ -173,39 +258,43 @@ function renderInvestment() {
   // Anyone can view opportunities
   const opportunitiesHtml = `
     <div class="card">
-      <h3>Investment Opportunities</h3>
-      <ul>
-        <li><strong>Bujumbura:</strong> Hotel/Lodge development + transport partnerships</li>
-        <li><strong>Gitega:</strong> Cultural tourism packages + accommodation upgrades</li>
-        <li><strong>North-West (Kibira):</strong> Eco-lodge pilot + guided trail services</li>
-      </ul>
+      <div class="card-body">
+        <h3 class="card-title">Investment Opportunities</h3>
+        <ul class="card-text" style="padding-left: 20px;">
+          <li><strong>Bujumbura:</strong> Hotel/Lodge development + transport partnerships</li>
+          <li><strong>Gitega:</strong> Cultural tourism packages + accommodation upgrades</li>
+          <li><strong>North-West (Kibira):</strong> Eco-lodge pilot + guided trail services</li>
+        </ul>
+      </div>
     </div>
   `;
 
   // Only Investor (or Admin) can submit inquiry (RBAC)
   const inquiryFormHtml = `
     <div class="card">
-      <h3>Send an Investor Inquiry</h3>
-      <form id="inquiryForm">
-        <label>Target Zone</label>
-        <select id="inqZone" required>
-          ${tourismZones.map(z => `<option value="${z.name}">${z.name}</option>`).join("")}
-        </select>
+      <div class="card-body">
+        <h3 class="card-title">Send an Investor Inquiry</h3>
+        <form id="inquiryForm" class="form-grid">
+          <label class="card-text">Target Zone</label>
+          <select id="inqZone" class="select" required>
+            ${tourismZones.map(z => `<option value="${z.name}">${z.name}</option>`).join("")}
+          </select>
 
-        <label>Investment Type</label>
-        <select id="inqType" required>
-          <option value="Hospitality (Hotel/Lodge)">Hospitality (Hotel/Lodge)</option>
-          <option value="Transport Services">Transport Services</option>
-          <option value="ICT / Digital Services">ICT / Digital Services</option>
-          <option value="Community Enterprise">Community Enterprise</option>
-        </select>
+          <label class="card-text">Investment Type</label>
+          <select id="inqType" class="select" required>
+            <option value="Hospitality (Hotel/Lodge)">Hospitality (Hotel/Lodge)</option>
+            <option value="Transport Services">Transport Services</option>
+            <option value="ICT / Digital Services">ICT / Digital Services</option>
+            <option value="Community Enterprise">Community Enterprise</option>
+          </select>
 
-        <label>Message</label>
-        <textarea id="inqMessage" required placeholder="Explain your interest, budget range, and what support you need."></textarea>
+          <label class="card-text">Message</label>
+          <textarea id="inqMessage" class="textarea" required placeholder="Explain your interest, budget range, and what support you need."></textarea>
 
-        <button class="btn" type="submit">Submit Inquiry</button>
-      </form>
-      <p><em>Your inquiry will be reviewed by Admin for follow-up.</em></p>
+          <button class="btn btn-primary" type="submit" style="margin-top: 10px;">Submit Inquiry</button>
+        </form>
+        <p class="muted" style="margin-top: 10px;"><em>Your inquiry will be reviewed by Admin for follow-up.</em></p>
+      </div>
     </div>
   `;
 
@@ -276,32 +365,36 @@ function renderCommunity() {
 
   const servicesListHtml = `
     <div class="card">
-      <h3>Approved Community Services</h3>
-      ${approvedServices.length === 0 ? "<p><em>No approved services yet.</em></p>" : ""}
-      ${approvedServices.map(s => `
-        <div class="mini">
-          <p><strong>${s.businessName}</strong> (${s.category})</p>
-          <p><strong>Location:</strong> ${s.location}</p>
-          <p>${s.description}</p>
-          <p><strong>Contact:</strong> ${s.contact}</p>
-        </div>
-      `).join("")}
+      <div class="card-body">
+        <h3 class="card-title">Approved Community Services</h3>
+        ${approvedServices.length === 0 ? "<p class='muted'><em>No approved services yet.</em></p>" : ""}
+        ${approvedServices.map(s => `
+          <div class="mini-card">
+            <p><strong>${s.businessName}</strong> (${s.category})</p>
+            <p class="card-text"><strong>Location:</strong> ${s.location}</p>
+            <p class="card-text">${s.description}</p>
+            <p class="card-text"><strong>Contact:</strong> ${s.contact}</p>
+          </div>
+        `).join("")}
+      </div>
     </div>
   `;
 
   // Public jobs list
   const jobsListHtml = `
     <div class="card">
-      <h3>Jobs & Internships</h3>
-      ${jobs.length === 0 ? "<p><em>No jobs posted yet.</em></p>" : ""}
-      ${jobs.map(j => `
-        <div class="mini">
-          <p><strong>${j.title}</strong> — ${j.company}</p>
-          <p><strong>Location:</strong> ${j.location} | <strong>Type:</strong> ${j.type}</p>
-          <p>${j.description}</p>
-          <p><strong>Apply:</strong> ${j.applyContact}</p>
-        </div>
-      `).join("")}
+      <div class="card-body">
+        <h3 class="card-title">Jobs & Internships</h3>
+        ${jobs.length === 0 ? "<p class='muted'><em>No jobs posted yet.</em></p>" : ""}
+        ${jobs.map(j => `
+          <div class="mini-card">
+            <p><strong>${j.title}</strong> — ${j.company}</p>
+            <p class="card-text"><strong>Location:</strong> ${j.location} | <strong>Type:</strong> ${j.type}</p>
+            <p class="card-text">${j.description}</p>
+            <p class="card-text"><strong>Apply:</strong> ${j.applyContact}</p>
+          </div>
+        `).join("")}
+      </div>
     </div>
   `;
 
@@ -440,14 +533,14 @@ function renderAdminPanel() {
   const inquiries = getInquiries();
   inqBox.innerHTML = inquiries.length
     ? inquiries.map(i => `
-      <div class="mini">
-        <p><strong>${i.status}</strong> — ${new Date(i.createdAt).toLocaleString()}</p>
-        <p><strong>Investor:</strong> ${i.investorName} (${i.investorEmail})</p>
-        <p><strong>Zone:</strong> ${i.zone} | <strong>Type:</strong> ${i.type}</p>
-        <p>${i.message}</p>
-        <div class="row">
-          <button class="btn" onclick="setInquiryStatus('${i.id}', 'In Review')">In Review</button>
-          <button class="btn" onclick="setInquiryStatus('${i.id}', 'Resolved')">Resolved</button>
+      <div class="mini-card">
+        <p class="card-text"><strong>${i.status}</strong> — ${new Date(i.createdAt).toLocaleString()}</p>
+        <p class="card-text"><strong>Investor:</strong> ${i.investorName} (${i.investorEmail})</p>
+        <p class="card-text"><strong>Zone:</strong> ${i.zone} | <strong>Type:</strong> ${i.type}</p>
+        <p class="card-text">${i.message}</p>
+        <div class="actions" style="margin-top: 10px;">
+          <button class="btn btn-secondary btn-small" onclick="setInquiryStatus('${i.id}', 'In Review')">In Review</button>
+          <button class="btn btn-primary btn-small" onclick="setInquiryStatus('${i.id}', 'Resolved')">Resolved</button>
         </div>
       </div>
     `).join("")
@@ -457,16 +550,16 @@ function renderAdminPanel() {
   const services = getServices();
   svcBox.innerHTML = services.length
     ? services.map(s => `
-      <div class="mini">
-        <p><strong>${s.status}</strong> — ${new Date(s.createdAt).toLocaleString()}</p>
-        <p><strong>${s.businessName}</strong> (${s.category})</p>
-        <p><strong>Owner:</strong> ${s.ownerName} (${s.ownerEmail})</p>
-        <p><strong>Location:</strong> ${s.location}</p>
-        <p>${s.description}</p>
-        <p><strong>Contact:</strong> ${s.contact}</p>
-        <div class="row">
-          <button class="btn" onclick="setServiceStatus('${s.id}', 'Approved')">Approve</button>
-          <button class="btn" onclick="setServiceStatus('${s.id}', 'Rejected')">Reject</button>
+      <div class="mini-card">
+        <p class="card-text"><strong>${s.status}</strong> — ${new Date(s.createdAt).toLocaleString()}</p>
+        <p class="card-text"><strong>${s.businessName}</strong> (${s.category})</p>
+        <p class="card-text"><strong>Owner:</strong> ${s.ownerName} (${s.ownerEmail})</p>
+        <p class="card-text"><strong>Location:</strong> ${s.location}</p>
+        <p class="card-text">${s.description}</p>
+        <p class="card-text"><strong>Contact:</strong> ${s.contact}</p>
+        <div class="actions" style="margin-top: 10px;">
+          <button class="btn btn-primary btn-small" onclick="setServiceStatus('${s.id}', 'Approved')">Approve</button>
+          <button class="btn btn-small danger" onclick="setServiceStatus('${s.id}', 'Rejected')">Reject</button>
         </div>
       </div>
     `).join("")
@@ -476,12 +569,14 @@ function renderAdminPanel() {
   const jobs = getJobs();
   jobBox.innerHTML = jobs.length
     ? jobs.map(j => `
-      <div class="mini">
-        <p><strong>${j.title}</strong> — ${j.company}</p>
-        <p><strong>Location:</strong> ${j.location} | <strong>Type:</strong> ${j.type}</p>
-        <p>${j.description}</p>
-        <p><strong>Apply:</strong> ${j.applyContact}</p>
-        <button class="btn" onclick="deleteJob('${j.id}')">Delete</button>
+      <div class="mini-card">
+        <p class="card-text"><strong>${j.title}</strong> — ${j.company}</p>
+        <p class="card-text"><strong>Location:</strong> ${j.location} | <strong>Type:</strong> ${j.type}</p>
+        <p class="card-text">${j.description}</p>
+        <p class="card-text"><strong>Apply:</strong> ${j.applyContact}</p>
+        <div class="actions" style="margin-top: 10px;">
+          <button class="btn btn-small danger" onclick="deleteJob('${j.id}')">Delete</button>
+        </div>
       </div>
     `).join("")
     : "<p><em>No jobs posted yet.</em></p>";

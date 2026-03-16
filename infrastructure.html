@@ -23,87 +23,44 @@
       <nav class="nav-links" id="siteNav">
         <a href="index.html">Home</a>
         <a href="tourism.html">Tourism</a>
-        <a href="infrastructure.html">Infrastructure</a>
+        <a href="infrastructure.html" class="active">Infrastructure</a>
         <a href="investment.html">Investment</a>
         <a href="community.html">Community</a>
-        <a href="admin.html">Admin</a>
-        <a class="nav-cta" href="login.html">Login</a>
+        <a href="admin.html" data-admin-link style="display:none;">Admin</a>
       </nav>
+      <div class="nav-auth" id="authArea"></div>
     </div>
   </header>
 
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <h2>Readiness Dashboard</h2>
-        <p>Demo scores to show where development improves tourism + investment outcomes.</p>
+        <h2>Infrastructure Readiness</h2>
+        <p>Strategic readiness scores based on community-verified landmark routes and utilities. Use this dashboard to assess investment and travel safety.</p>
       </div>
 
-      <div class="grid-4">
-        <div class="card">
-          <div class="card-body"><span class="badge">🛣️ Roads</span>
-            <h3 class="card-title">72/100</h3>
-            <p class="card-text">Good main access, rural routes need upgrades.</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body"><span class="badge">💧 Utilities</span>
-            <h3 class="card-title">65/100</h3>
-            <p class="card-text">Water & power improving, consistency varies.</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body"><span class="badge">📶 ICT</span>
-            <h3 class="card-title">70/100</h3>
-            <p class="card-text">Coverage growing; hotspots near key sites.</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body"><span class="badge">🧑‍⚕️ Safety</span>
-            <h3 class="card-title">60/100</h3>
-            <p class="card-text">Health services need better access in zones.</p>
-          </div>
-        </div>
+      <div class="grid-4" id="infraCards">
+        <!-- Dynamically rendered -->
       </div>
 
-      <div style="height:18px"></div>
+      <div style="height:32px"></div>
 
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Zone</th>
-            <th>Overall</th>
-            <th>Key Gap</th>
-            <th>Recommendation</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Bujumbura Lakeshore</strong></td>
-            <td><span class="pill ok">78/100 • Good</span></td>
-            <td>Waste management</td>
-            <td>Improve cleanliness + public facilities.</td>
-          </tr>
-          <tr>
-            <td><strong>Kibira Eco-Tourism</strong></td>
-            <td><span class="pill warn">64/100 • Medium</span></td>
-            <td>Road access</td>
-            <td>Upgrade feeder roads + utilities.</td>
-          </tr>
-          <tr>
-            <td><strong>Gitega Cultural Corridor</strong></td>
-            <td><span class="pill warn">69/100 • Medium</span></td>
-            <td>Accommodation capacity</td>
-            <td>Support eco-lodges + SME hospitality.</td>
-          </tr>
-          <tr>
-            <td><strong>Rutovu Landmark</strong></td>
-            <td><span class="pill bad">58/100 • Low</span></td>
-            <td>Transport + ICT</td>
-            <td>Enable shuttle routes + Wi-Fi points.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card" style="padding: 0; overflow-x: auto; border:none; box-shadow: var(--shadow-md);">
+        <table class="table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th>Zone/Corridor</th>
+              <th>Safe-Discovery Readiness</th>
+              <th>Critical Gap</th>
+              <th>Strategic Recommendation</th>
+              <th>Report</th>
+            </tr>
+          </thead>
+          <tbody id="infraTableBody">
+            <!-- Dynamically rendered -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 
