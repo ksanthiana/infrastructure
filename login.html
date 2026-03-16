@@ -30,32 +30,29 @@
 
   <section class="section">
     <div class="container">
-      <div class="section-header">
-        <h2>Login</h2>
-        <p>Use your real local account. Admin test account is already seeded.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-body">
-            <h3 style="margin-top:0">Sign in</h3>
-            <form id="loginForm" class="form-grid">
-              <input id="loginEmail" class="input" type="email" required placeholder="Email" />
-              <input id="loginPassword" class="input" type="password" required placeholder="Password" />
-              <button class="btn btn-primary" type="submit">Login</button>
-            </form>
-            <div id="loginNote" class="notice">
-              Admin test: <strong>admin@sitburundi.com</strong> / <strong>Admin123!</strong>
+      <div class="auth-centered">
+        <div class="auth-card">
+          <div class="section-header" style="text-align: center; margin-bottom: 24px;">
+            <h2 style="margin-bottom: 8px;">Welcome Back</h2>
+            <p>Sign in to your SIT Burundi account</p>
+          </div>
+          <form id="loginForm" class="form-grid">
+            <div style="margin-bottom: 16px;">
+              <label class="label">Email Address</label>
+              <input id="loginEmail" class="input" type="email" required placeholder="name@example.com" />
             </div>
+            <div style="margin-bottom: 24px;">
+              <label class="label">Password</label>
+              <input id="loginPassword" class="input" type="password" required placeholder="••••••••" />
+            </div>
+            <button class="btn btn-primary w-full" type="submit" style="width: 100%;">Login</button>
+          </form>
+          <div id="loginNote" class="notice" style="margin-top: 24px; text-align: center;">
+            Admin test: <strong>admin@sitburundi.com</strong> / <strong>Admin123!</strong>
           </div>
-        </div>
-
-        <div class="card">
-          <div class="card-body">
-            <h3 style="margin-top:0">Need an account?</h3>
-            <p>Create an account as Tourist, Investor, or Community user.</p>
-            <a class="btn btn-secondary" href="register.html">Create account</a>
-          </div>
+          <p style="text-align: center; margin-top: 24px; font-size: 14px; color: var(--slate-600);">
+            Don't have an account? <a href="register.html" style="color: var(--primary); font-weight: 600;">Create one</a>
+          </p>
         </div>
       </div>
     </div>

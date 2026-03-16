@@ -128,14 +128,37 @@ function renderDestinationDetails() {
     </div>
   `;
 
-  // We are removing Leaflet maps to prioritize landmark-based discovery as per the pivot.
+  // Re-enabling the map for visual context
   const mapBox = $("map");
-  if (mapBox) mapBox.style.display = "none";
+  if (mapBox) {
+    mapBox.style.display = "block";
+    if (typeof L !== "undefined") {
+      renderLeafletMap(d);
+    }
+  }
 }
 
 function renderLeafletMap(destination) {
-  // Disabled in favor of landmark-based routing
-  return;
+  const mapContainer = $("map");
+  if (!mapContainer) return;
+
+  // Clear existing map instance if any
+  if (window.mapInstance) {
+    window.mapInstance.remove();
+  }
+
+  const map = L.map("map").setView([destination.lat, destination.lng], 13);
+  window.mapInstance = map;
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  L.marker([destination.lat, destination.lng])
+    .addTo(map)
+    .bindPopup(`<b>${destination.name}</b><br>${destination.landmarkDirections}`)
+    .openPopup();
 }
 
 // -------------------- Infrastructure --------------------
@@ -521,65 +544,122 @@ function renderCommunity() {
 
 // -------------------- Admin Panel (Approvals) --------------------
 function renderAdminPanel() {
+  const statsBox = $("adminStats");
   const inqBox = $("adminInquiries");
   const svcBox = $("adminServices");
   const jobBox = $("adminJobs");
-  if (!inqBox && !svcBox && !jobBox) return;
+  if (!statsBox && !inqBox && !svcBox && !jobBox) return;
 
   const user = requireAuth(["Admin"]);
   if (!user) return;
 
-  // Inquiries
   const inquiries = getInquiries();
-  inqBox.innerHTML = inquiries.length
-    ? inquiries.map(i => `
-      <div class="mini-card">
-        <p class="card-text"><strong>${i.status}</strong> — ${new Date(i.createdAt).toLocaleString()}</p>
-        <p class="card-text"><strong>Investor:</strong> ${i.investorName} (${i.investorEmail})</p>
-        <p class="card-text"><strong>Zone:</strong> ${i.zone} | <strong>Type:</strong> ${i.type}</p>
-        <p class="card-text">${i.message}</p>
-        <div class="actions" style="margin-top: 10px;">
-          <button class="btn btn-secondary btn-small" onclick="setInquiryStatus('${i.id}', 'In Review')">In Review</button>
-          <button class="btn btn-primary btn-small" onclick="setInquiryStatus('${i.id}', 'Resolved')">Resolved</button>
-        </div>
-      </div>
-    `).join("")
-    : "<p><em>No inquiries yet.</em></p>";
-
-  // Services approvals
   const services = getServices();
-  svcBox.innerHTML = services.length
-    ? services.map(s => `
-      <div class="mini-card">
-        <p class="card-text"><strong>${s.status}</strong> — ${new Date(s.createdAt).toLocaleString()}</p>
-        <p class="card-text"><strong>${s.businessName}</strong> (${s.category})</p>
-        <p class="card-text"><strong>Owner:</strong> ${s.ownerName} (${s.ownerEmail})</p>
-        <p class="card-text"><strong>Location:</strong> ${s.location}</p>
-        <p class="card-text">${s.description}</p>
-        <p class="card-text"><strong>Contact:</strong> ${s.contact}</p>
-        <div class="actions" style="margin-top: 10px;">
-          <button class="btn btn-primary btn-small" onclick="setServiceStatus('${s.id}', 'Approved')">Approve</button>
-          <button class="btn btn-small danger" onclick="setServiceStatus('${s.id}', 'Rejected')">Reject</button>
+  const jobs = getJobs();
+
+  // 1. Render Stats
+  if (statsBox) {
+    statsBox.innerHTML = `
+      <div class="card">
+        <div class="card-body">
+          <span class="badge">Inquiries</span>
+          <h3 class="card-title">${inquiries.length}</h3>
+          <p class="muted">Investor requests</p>
         </div>
       </div>
-    `).join("")
-    : "<p><em>No services submitted yet.</em></p>";
+      <div class="card">
+        <div class="card-body">
+          <span class="badge">Services</span>
+          <h3 class="card-title">${services.filter(s => s.status === 'Pending').length}</h3>
+          <p class="muted">Pending approval</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <span class="badge">Jobs</span>
+          <h3 class="card-title">${jobs.length}</h3>
+          <p class="muted">Active listings</p>
+        </div>
+      </div>
+    `;
+  }
 
-  // Jobs moderation
-  const jobs = getJobs();
-  jobBox.innerHTML = jobs.length
-    ? jobs.map(j => `
-      <div class="mini-card">
-        <p class="card-text"><strong>${j.title}</strong> — ${j.company}</p>
-        <p class="card-text"><strong>Location:</strong> ${j.location} | <strong>Type:</strong> ${j.type}</p>
-        <p class="card-text">${j.description}</p>
-        <p class="card-text"><strong>Apply:</strong> ${j.applyContact}</p>
-        <div class="actions" style="margin-top: 10px;">
+  // 2. Inquiries Table
+  if (inqBox) {
+    inqBox.innerHTML = inquiries.length
+      ? `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Investor</th>
+              <th>Zone / Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${inquiries.map(i => `
+              <tr>
+                <td>${new Date(i.createdAt).toLocaleDateString()}</td>
+                <td><strong>${i.investorName}</strong><br><small>${i.investorEmail}</small></td>
+                <td>${i.zone}<br><small>${i.type}</small></td>
+                <td><span class="pill ${i.status === 'Resolved' ? 'ok' : (i.status === 'In Review' ? 'warn' : 'bad')}">${i.status}</span></td>
+                <td>
+                  <button class="btn btn-small" onclick="setInquiryStatus('${i.id}', 'In Review')">Review</button>
+                  <button class="btn btn-small btn-primary" onclick="setInquiryStatus('${i.id}', 'Resolved')">Resolve</button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `
+      : "<p class='muted'><em>No inquiries yet.</em></p>";
+  }
+
+  // 3. Services Table
+  if (svcBox) {
+    svcBox.innerHTML = services.length
+      ? `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${services.map(s => `
+              <tr>
+                <td><strong>${s.businessName}</strong><br><small>${s.category}</small></td>
+                <td>${s.ownerName}<br><small>${s.location}</small></td>
+                <td><span class="pill ${s.status === 'Approved' ? 'ok' : (s.status === 'Pending' ? 'warn' : 'bad')}">${s.status}</span></td>
+                <td>
+                  <button class="btn btn-small btn-primary" onclick="setServiceStatus('${s.id}', 'Approved')">Approve</button>
+                  <button class="btn btn-small danger" onclick="setServiceStatus('${s.id}', 'Rejected')">Reject</button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `
+      : "<p class='muted'><em>No services submitted yet.</em></p>";
+  }
+
+  // 4. Jobs Moderation
+  if (jobBox) {
+    jobBox.innerHTML = jobs.length
+      ? jobs.map(j => `
+        <div class="mini-card" style="margin-bottom: 12px; padding: 12px; border-radius: 8px;">
+          <p style="margin:0"><strong>${j.title}</strong></p>
+          <p class="muted" style="font-size: 11px; margin-bottom: 8px;">${j.company} | ${j.location}</p>
           <button class="btn btn-small danger" onclick="deleteJob('${j.id}')">Delete</button>
         </div>
-      </div>
-    `).join("")
-    : "<p><em>No jobs posted yet.</em></p>";
+      `).join("")
+      : "<p class='muted'><em>No jobs posted yet.</em></p>";
+  }
 }
 
 window.setInquiryStatus = function (id, status) {

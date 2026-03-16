@@ -34,23 +34,50 @@
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <h2>Admin dashboard</h2>
-        <p>Review inquiries, approve services, and manage job listings.</p>
+        <span class="badge">Control Center</span>
+        <h2 style="margin-top: 10px;">Admin Dashboard</h2>
+        <p>Review system inquiries, approve community services, and moderate job listings.</p>
       </div>
 
-      <div id="adminStats"></div>
+      <!-- Admin Stats / KPIs -->
+      <div class="kpi-row" id="adminStats" style="margin-bottom: 40px;">
+        <!-- Dynamically filled -->
+      </div>
 
-      <div style="height:18px"></div>
-      <h3>Investor inquiries</h3>
-      <div id="adminInquiries"></div>
+      <div class="split">
+        <!-- Main Actions Column -->
+        <div style="flex: 2;">
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-body">
+              <h3 style="margin: 0 0 16px;">Investor Inquiries</h3>
+              <div id="adminInquiries" class="table-responsive">
+                <!-- Dynamically filled with table -->
+              </div>
+            </div>
+          </div>
 
-      <div style="height:18px"></div>
-      <h3>Service approvals</h3>
-      <div id="adminServices"></div>
+          <div class="card">
+            <div class="card-body">
+              <h3 style="margin: 0 0 16px;">Service Approvals</h3>
+              <div id="adminServices" class="table-responsive">
+                <!-- Dynamically filled with table -->
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div style="height:18px"></div>
-      <h3>Jobs moderation</h3>
-      <div id="adminJobs"></div>
+        <!-- Sidebar Actions Column -->
+        <div style="flex: 1;">
+          <div class="card">
+            <div class="card-body">
+              <h3 style="margin: 0 0 16px;">Jobs Moderation</h3>
+              <div id="adminJobs">
+                <!-- Dynamically filled -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

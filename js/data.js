@@ -12,7 +12,9 @@ const destinations = [
     verifiedBy: "Bujumbura Local Guide Hub",
     visibilityRoles: ["Tourist", "Investor", "Community", "Guide"],
     services: ["Hotels", "Restaurants", "Boat tours", "Local transport"],
-    zoneId: "bujumbura"
+    zoneId: "bujumbura",
+    lat: -3.3822,
+    lng: 29.3644
   },
   {
     id: "kibira-national-park",
@@ -27,7 +29,9 @@ const destinations = [
     verifiedBy: "Kibira Eco-Validators",
     visibilityRoles: ["Tourist", "Investor", "Community", "Guide"],
     services: ["Guided hikes", "Camping", "Eco-lodges"],
-    zoneId: "kibira"
+    zoneId: "kibira",
+    lat: -2.9333,
+    lng: 29.5
   },
   {
     id: "gishora-drum-sanctuary",
@@ -42,7 +46,77 @@ const destinations = [
     verifiedBy: "Gitega Community Council",
     visibilityRoles: ["Tourist", "Investor", "Community", "Guide"],
     services: ["Cultural tours", "Craft markets", "Guesthouses"],
-    zoneId: "gitega"
+    zoneId: "gitega",
+    lat: -3.428,
+    lng: 29.93
+  },
+  {
+    id: "rusizi-national-park",
+    name: "Rusizi National Park",
+    region: "West",
+    province: "Bujumbura Rural",
+    category: "park",
+    label: "Nature",
+    description: "Experience the delta where the Rusizi River meets Lake Tanganyika. Famous for hippos and birdlife.",
+    image: "https://images.unsplash.com/photo-1516422317950-ad91171b2049?auto=format&fit=crop&w=1200&q=80",
+    landmarkDirections: "15km north of Bujumbura city center. Follow the RN4 highway towards the border.",
+    verifiedBy: "Bujumbura Delta Rangers",
+    visibilityRoles: ["Tourist", "Investor", "Community", "Guide"],
+    services: ["Boat safaris", "Birdwatching", "Guided walks"],
+    zoneId: "bujumbura",
+    lat: -3.32,
+    lng: 29.27
+  },
+  {
+    id: "source-of-the-nile",
+    name: "Source of the Nile (Rutovu)",
+    region: "South",
+    province: "Bururi",
+    category: "culture",
+    label: "Landmark",
+    description: "Visit the southern-most source of the world's longest river in the heart of Burundi.",
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+    landmarkDirections: "Located in Rutovu. Look for the pyramid monument atop the hill near the village center.",
+    verifiedBy: "Rutovu Heritage Trust",
+    visibilityRoles: ["Tourist", "Investor", "Community", "Guide"],
+    services: ["Local guides", "Photography", "Souvenirs"],
+    zoneId: "rutovu",
+    lat: -3.91,
+    lng: 29.85
+  },
+  {
+    id: "mount-heha",
+    name: "Mount Heha",
+    region: "West",
+    province: "Bujumbura Rural",
+    category: "nature",
+    label: "Peak",
+    description: "The highest mountain in Burundi, offering breathtaking views and rigorous trekking opportunities.",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
+    landmarkDirections: "Start from the Mugaruro community hub. Follow the markers left of the central broadcast tower.",
+    verifiedBy: "Burundi Alpine Club",
+    visibilityRoles: ["Tourist", "Investor", "Community", "Guide"],
+    services: ["Trekking guides", "Camping", "Photography"],
+    zoneId: "bujumbura",
+    lat: -3.44,
+    lng: 29.49
+  },
+  {
+    id: "lake-rwihinda",
+    name: "Lake Rwihinda (Bird Lake)",
+    region: "North",
+    province: "Kirundo",
+    category: "lake",
+    label: "Birding",
+    description: "A sanctuary for migratory birds. A must-visit for nature lovers and birdwatchers.",
+    image: "https://images.unsplash.com/photo-1444464666168-49d633b867ad?auto=format&fit=crop&w=1200&q=80",
+    landmarkDirections: "Located in Kirundo province. Follow the community signage near the lake shore entrance.",
+    verifiedBy: "Kirundo Birding Club",
+    visibilityRoles: ["Tourist", "Investor", "Community", "Guide"],
+    services: ["Birding tours", "Boat rentals", "Eco-lodges"],
+    zoneId: "rutovu",
+    lat: -2.34,
+    lng: 30.01
   }
 ];
 
@@ -130,65 +204,98 @@ const investmentOpportunities = [
     expectedImpact: "Better visitor experience and digital promotion",
     roi: "Medium",
     summary: "Install public internet points near major destinations."
-  },
-  {
-    id: "waste-water",
-    title: "Waste & Water Facilities",
-    sector: "Sustainability",
-    location: "Bujumbura / Gitega",
-    zoneId: "bujumbura",
-    budget: "$40k - $160k",
-    expectedImpact: "Cleaner zones and stronger visitor confidence",
-    roi: "Long-term",
-    summary: "Improve sanitation, cleanliness, and public facilities."
   }
 ];
 
 const seedJobs = [
   {
     id: "job-tour-guide",
-    title: "Tour Guide",
-    company: "SIT Burundi Tours",
-    location: "Bujumbura",
-    type: "Part-time",
-    description: "Guide visitors around lakeside and city experiences.",
-    applyContact: "jobs@sitburundi.com",
+    title: "Senior Eco-Guide",
+    company: "Kibira Discovery",
+    location: "Kayanza",
+    type: "Full-time",
+    description: "Lead forest treks and educate visitors on biodiversity safe paths.",
+    applyContact: "jobs@kibiradiscovery.bi",
     createdAt: new Date().toISOString()
   },
   {
-    id: "job-reception",
-    title: "Reception Assistant",
-    company: "Gitega Heritage Lodge",
-    location: "Gitega",
+    id: "job-driver",
+    title: "Tourist Shuttle Driver",
+    company: "SIT Logistics",
+    location: "Bujumbura",
+    type: "Contract",
+    description: "Provide safe transport between Bujumbura and major landmarks.",
+    applyContact: "drive@sit-logistics.bi",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "job-hospitality",
+    title: "Hospitality Manager",
+    company: "Lakeside Lodge",
+    location: "Lake Tanganyika",
     type: "Full-time",
-    description: "Support front desk and guest coordination.",
-    applyContact: "careers@gitegaheritage.com",
+    description: "Manage guest services and ensure high standards of safety and comfort.",
+    applyContact: "careers@lakesidelodge.bi",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "job-ict",
+    title: "Community ICT Specialist",
+    company: "SIT Burundi Tech",
+    location: "Gitega",
+    type: "Part-time",
+    description: "Maintain Wi-Fi hotspots and digital service points in cultural hubs.",
+    applyContact: "tech@sit-burundi.bi",
     createdAt: new Date().toISOString()
   }
 ];
 
 const seedServices = [
   {
-    id: "svc-driver-1",
-    ownerName: "Jean N.",
-    ownerEmail: "jean@example.com",
-    businessName: "Jean Local Driver",
-    category: "Transport",
-    location: "Bujumbura",
-    description: "Airport pickups and day trips for visitors.",
-    contact: "+257 79 000 111",
+    id: "svc-handicraft",
+    ownerName: "Cynthia B.",
+    ownerEmail: "cynthia@example.com",
+    businessName: "Gitega Artisans Hub",
+    category: "Arts & Crafts",
+    location: "Gitega",
+    description: "Authentic handmade drums and traditional crafts.",
+    contact: "+257 79 123 456",
     status: "Approved",
     createdAt: new Date().toISOString()
   },
   {
-    id: "svc-crafts-1",
-    ownerName: "Aline M.",
-    ownerEmail: "aline@example.com",
-    businessName: "Aline Crafts",
-    category: "Arts & Crafts",
-    location: "Gitega",
-    description: "Handmade crafts and souvenirs supporting local artisans.",
-    contact: "+257 79 000 222",
+    id: "svc-boat",
+    ownerName: "Peter K.",
+    ownerEmail: "peter@example.com",
+    businessName: "Tanganyika Sunset Tours",
+    category: "Transport",
+    location: "Bujumbura",
+    description: "Verified boat tours and sunset cruises on the lake.",
+    contact: "+257 61 789 012",
+    status: "Approved",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "svc-restaurant",
+    ownerName: "Maria G.",
+    ownerEmail: "maria@example.com",
+    businessName: "Hillside Terrace",
+    category: "Food & Restaurant",
+    location: "Near Mt. Heha",
+    description: "Traditional Burundian cuisine with a panoramic view.",
+    contact: "+257 71 345 678",
+    status: "Approved",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "svc-hotel",
+    ownerName: "Samuel O.",
+    ownerEmail: "sam@example.com",
+    businessName: "Heritage Guesthouse",
+    category: "Accommodation",
+    location: "Gishora",
+    description: "Stay in a traditional-style guesthouse near the drum sanctuary.",
+    contact: "+257 75 000 999",
     status: "Approved",
     createdAt: new Date().toISOString()
   }

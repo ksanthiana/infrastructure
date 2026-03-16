@@ -30,38 +30,40 @@
 
   <section class="section">
     <div class="container">
-      <div class="section-header">
-        <h2>Create account</h2>
-        <p>This now saves a real local account in your browser.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-body">
-            <h3 style="margin-top:0">Register</h3>
-            <form id="registerForm" class="form-grid">
-              <input id="regName" class="input" type="text" required placeholder="Full name" />
-              <input id="regEmail" class="input" type="email" required placeholder="Email" />
-              <input id="regPassword" class="input" type="password" required
-                placeholder="Password (min 6 characters)" />
+      <div class="auth-centered">
+        <div class="auth-card">
+          <div class="section-header" style="text-align: center; margin-bottom: 24px;">
+            <h2 style="margin-bottom: 8px;">Create Account</h2>
+            <p>Join the SIT Burundi community</p>
+          </div>
+          <form id="registerForm" class="form-grid">
+            <div style="margin-bottom: 16px;">
+              <label class="label">Full Name</label>
+              <input id="regName" class="input" type="text" required placeholder="Enter your name" />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label class="label">Email Address</label>
+              <input id="regEmail" class="input" type="email" required placeholder="name@example.com" />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label class="label">Password</label>
+              <input id="regPassword" class="input" type="password" required placeholder="Min 6 characters" />
+            </div>
+            <div style="margin-bottom: 24px;">
+              <label class="label">Choose Your Role</label>
               <select id="regRole" class="select" required>
-                <option value="">Choose role</option>
+                <option value="">Select a role</option>
                 <option value="Tourist">Tourist</option>
                 <option value="Investor">Investor</option>
-                <option value="Community">Community</option>
+                <option value="Community">Community Member</option>
               </select>
-              <button class="btn btn-primary" type="submit">Create account</button>
-            </form>
-            <div id="registerNote" class="notice">After registration, you will be logged in automatically.</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-body">
-            <h3 style="margin-top:0">Already have an account?</h3>
-            <p>Login and continue using the platform.</p>
-            <a class="btn btn-secondary" href="login.html">Go to login</a>
-          </div>
+            </div>
+            <button class="btn btn-primary w-full" type="submit" style="width: 100%;">Create Account</button>
+          </form>
+          <div id="registerNote" class="notice" style="margin-top: 24px; text-align: center;">Automatically logs you in after creation.</div>
+          <p style="text-align: center; margin-top: 24px; font-size: 14px; color: var(--slate-600);">
+            Already have an account? <a href="login.html" style="color: var(--primary); font-weight: 600;">Sign in</a>
+          </p>
         </div>
       </div>
     </div>
