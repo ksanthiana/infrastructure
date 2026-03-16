@@ -92,6 +92,21 @@ function requireAuth(allowedRoles = []) {
   return user;
 }
 
+function checkLoginGate() {
+  const path = window.location.pathname.split("/").pop() || "index.html";
+  const publicPages = ["login.html", "register.html"];
+  
+  // If on a public page, don't gate
+  if (publicPages.includes(path)) return;
+
+  const user = getSession();
+  if (!user) {
+    // Save current path to redirect back after login? 
+    // Simple version: just redirect to login
+    window.location.href = "login.html";
+  }
+}
+
 function updateNavAuthUI() {
   const authArea = document.getElementById("authArea");
 

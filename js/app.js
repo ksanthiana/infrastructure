@@ -695,14 +695,51 @@ function hideAdminLinkIfNeeded() {
 
 // -------------------- Boot --------------------
 document.addEventListener("DOMContentLoaded", () => {
+  // 1. Mandatory Login Gate
+  if (typeof checkLoginGate === "function") checkLoginGate();
+
+  // 2. Ensure admin exists
+  if (typeof ensureSeedUsers === "function") ensureSeedUsers();
+
+  // 3. UI Updates
   updateNavAuthUI();
   hideAdminLinkIfNeeded();
 
+  // 4. Page Rendering
   renderDestinations();
   renderDestinationDetails();
   renderInfrastructure();
-
   renderInvestment();
   renderCommunity();
   renderAdminPanel();
+
+  // 5. Auth Form Handling
+  const loginForm = $("loginForm");
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const res = loginUser($("loginEmail")?.value, $("loginPassword")?.value);
+      if (res.ok) window.location.href = "index.html";
+      else alert(res.message);
+    });
+  }
+
+  const registerForm = $("registerForm");
+  if (registerForm) {
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const pass = $("regPassword")?.value;
+      if (pass?.length < 6) return alert("Password too short");
+      const res = registerUser({
+        name: $("regName")?.value,
+        email: $("regEmail")?.value,
+        password: pass,
+        role: $("regRole")?.value
+      });
+      if (res.ok) {
+        alert("Success! Redirecting...");
+        window.location.href = "index.html";
+      } else alert(res.message);
+    });
+  }
 });
