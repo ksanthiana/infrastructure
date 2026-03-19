@@ -1,4 +1,4 @@
-const destinations = [
+const defaultDestinations = [
   {
     id: "lake-tanganyika",
     name: "Lake Tanganyika",
@@ -120,7 +120,7 @@ const destinations = [
   }
 ];
 
-const tourismZones = [
+const defaultTourismZones = [
   {
     id: "bujumbura",
     name: "Bujumbura Lakeshore",
@@ -170,6 +170,18 @@ const tourismZones = [
     recommendation: "Expand shuttle routes, signage, and public connectivity points."
   }
 ];
+
+let destinations = typeof readLS === 'function' ? readLS('destinations', defaultDestinations) : defaultDestinations;
+let tourismZones = typeof readLS === 'function' ? readLS('tourismZones', defaultTourismZones) : defaultTourismZones;
+
+function saveDestinations(items) {
+  if(typeof writeLS === 'function') writeLS('destinations', items);
+  destinations = items;
+}
+function saveTourismZones(items) {
+  if(typeof writeLS === 'function') writeLS('tourismZones', items);
+  tourismZones = items;
+}
 
 const investmentOpportunities = [
   {

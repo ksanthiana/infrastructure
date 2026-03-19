@@ -542,13 +542,76 @@ function renderCommunity() {
   }
 }
 
+// -------------------- C) FEEDBACK & REPORTING (FR-13) --------------------
+function getFeedbacks() {
+  return readLS("feedbacks", []);
+}
+function saveFeedbacks(items) {
+  writeLS("feedbacks", items);
+}
+
+function renderFeedbackForm() {
+  const box = $("feedbackBox");
+  if (!box) return;
+
+  const user = getSession();
+  if (!user) {
+    box.innerHTML = `<div class="card"><div class="card-body"><em>Please log in to submit feedback or report issues.</em></div></div>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="card">
+      <div class="card-body">
+        <form id="feedbackForm" class="form-grid">
+          <label class="label">Issue Type / Subject</label>
+          <select id="fbSubject" class="select" required>
+            <option value="Infrastructure Issue">Infrastructure Issue (Road/Water/Power)</option>
+            <option value="Destination Request">Suggest New Destination</option>
+            <option value="Safety/Mapping Report">Safety/Mapping Report</option>
+            <option value="General Feedback">General Feedback</option>
+          </select>
+
+          <label class="label">Message Details</label>
+          <textarea id="fbMessage" class="textarea" required placeholder="Describe the issue, location, or feedback..."></textarea>
+
+          <button class="btn btn-primary" style="margin-top: 10px;" type="submit">Submit Report</button>
+        </form>
+      </div>
+    </div>
+  `;
+
+  const form = $("feedbackForm");
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const items = getFeedbacks();
+      items.unshift({
+        id: uid("fb"),
+        createdAt: nowISO(),
+        status: "Pending",
+        userName: user.name,
+        userEmail: user.email,
+        subject: $("fbSubject").value,
+        message: $("fbMessage").value.trim()
+      });
+      saveFeedbacks(items);
+      alert("Thank you! Your feedback has been submitted to the administration.");
+      e.target.reset();
+    });
+  }
+}
+
 // -------------------- Admin Panel (Approvals) --------------------
 function renderAdminPanel() {
   const statsBox = $("adminStats");
   const inqBox = $("adminInquiries");
   const svcBox = $("adminServices");
   const jobBox = $("adminJobs");
-  if (!statsBox && !inqBox && !svcBox && !jobBox) return;
+  const contentBox = $("adminContent");
+  const feedbackBox = $("adminFeedbacks");
+  
+  if (!statsBox && !inqBox && !svcBox && !jobBox && !contentBox && !feedbackBox) return;
 
   const user = requireAuth(["Admin"]);
   if (!user) return;
@@ -556,6 +619,7 @@ function renderAdminPanel() {
   const inquiries = getInquiries();
   const services = getServices();
   const jobs = getJobs();
+  const feedbacks = getFeedbacks();
 
   // 1. Render Stats
   if (statsBox) {
@@ -660,7 +724,92 @@ function renderAdminPanel() {
       `).join("")
       : "<p class='muted'><em>No jobs posted yet.</em></p>";
   }
+
+  // 5. Admin Content Management (FR-08)
+  if (contentBox) {
+    contentBox.innerHTML = `
+      <form id="addDestForm" class="form-grid" style="margin-bottom: 24px;">
+        <label class="label">Add New Tourism Destination</label>
+        <input id="addDestName" class="input" required placeholder="Name (e.g. New Safari Park)" />
+        <input id="addDestRegion" class="input" required placeholder="Region / Province" />
+        <select id="addDestCat" class="select" required>
+          <option value="lake">Lake</option>
+          <option value="park">Park</option>
+          <option value="culture">Culture</option>
+          <option value="nature">Nature</option>
+        </select>
+        <textarea id="addDestDesc" class="textarea" required placeholder="Short Description..."></textarea>
+        <button class="btn btn-primary" type="submit" style="margin-top: 10px;">Add Destination</button>
+      </form>
+    `;
+
+    $("addDestForm")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nD = {
+        id: uid("dst"),
+        name: $("addDestName").value.trim(),
+        region: $("addDestRegion").value.trim(),
+        province: $("addDestRegion").value.trim(),
+        category: $("addDestCat").value,
+        label: $("addDestCat").options[$("addDestCat").selectedIndex].text,
+        description: $("addDestDesc").value.trim(),
+        image: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80",
+        landmarkDirections: "Follow main signs.",
+        verifiedBy: "Admin",
+        visibilityRoles: ["Tourist", "Investor", "Community", "Admin"],
+        services: [],
+        zoneId: "bujumbura",
+        lat: -3.3,
+        lng: 29.3
+      };
+      
+      const updatedDest = [nD, ...destinations];
+      saveDestinations(updatedDest);
+      alert("New destination added successfully!");
+      e.target.reset();
+    });
+  }
+
+  // 6. User Feedback / Reports (FR-13)
+  if (feedbackBox) {
+    feedbackBox.innerHTML = feedbacks.length
+      ? `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Subject & Message</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${feedbacks.map(f => `
+              <tr>
+                <td><strong>${f.userName}</strong><br><small>${new Date(f.createdAt).toLocaleDateString()}</small></td>
+                <td><strong>${f.subject}</strong><br>${f.message}</td>
+                <td><span class="pill ${f.status === 'Resolved' ? 'ok' : 'warn'}">${f.status}</span></td>
+                <td>
+                  <button class="btn btn-small btn-primary" onclick="setFeedbackStatus('${f.id}', 'Resolved')">Resolve</button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `
+      : "<p class='muted'><em>No feedback or reports yet.</em></p>";
+  }
 }
+
+window.setFeedbackStatus = function(id, status) {
+  const items = getFeedbacks();
+  const idx = items.findIndex(x => x.id === id);
+  if (idx > -1) {
+    items[idx].status = status;
+    saveFeedbacks(items);
+    renderAdminPanel();
+  }
+};
 
 window.setInquiryStatus = function (id, status) {
   const items = getInquiries();
@@ -711,6 +860,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderInfrastructure();
   renderInvestment();
   renderCommunity();
+  renderFeedbackForm();
   renderAdminPanel();
 
   // 5. Auth Form Handling
