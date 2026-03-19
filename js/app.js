@@ -433,12 +433,12 @@ function renderCommunity() {
     box.innerHTML += `
       <div class="card">
         <h3>Register a Community Service</h3>
-        <form id="serviceForm">
+        <form id="serviceForm" class="form-grid">
           <label>Business/Service Name</label>
-          <input id="svcName" required placeholder="e.g., Tanganyika Boat Tours" />
+          <input id="svcName" class="input" required placeholder="e.g., Tanganyika Boat Tours" />
 
           <label>Category</label>
-          <select id="svcCategory" required>
+          <select id="svcCategory" class="select" required>
             <option value="Guiding">Guiding</option>
             <option value="Accommodation">Accommodation</option>
             <option value="Food & Restaurant">Food & Restaurant</option>
@@ -447,15 +447,15 @@ function renderCommunity() {
           </select>
 
           <label>Location</label>
-          <input id="svcLocation" required placeholder="e.g., Bujumbura / Gitega / Near Kibira" />
+          <input id="svcLocation" class="input" required placeholder="e.g., Bujumbura / Gitega / Near Kibira" />
 
           <label>Description</label>
-          <textarea id="svcDesc" required placeholder="What do you offer? Price range? Availability?"></textarea>
+          <textarea id="svcDesc" class="textarea" required placeholder="What do you offer? Price range? Availability?"></textarea>
 
           <label>Contact (phone/email)</label>
-          <input id="svcContact" required placeholder="+257... or email" />
+          <input id="svcContact" class="input" required placeholder="+257... or email" />
 
-          <button class="btn" type="submit">Submit for Approval</button>
+          <button class="btn btn-primary" style="margin-top: 10px;" type="submit">Submit for Approval</button>
         </form>
         <p><em>Status will be “Pending” until Admin approves.</em></p>
       </div>
@@ -490,18 +490,18 @@ function renderCommunity() {
     box.innerHTML += `
       <div class="card">
         <h3>Post a Job / Internship (Admin)</h3>
-        <form id="jobForm">
+        <form id="jobForm" class="form-grid">
           <label>Title</label>
-          <input id="jobTitle" required placeholder="e.g., Tour Guide Intern" />
+          <input id="jobTitle" class="input" required placeholder="e.g., Tour Guide Intern" />
 
           <label>Company/Organization</label>
-          <input id="jobCompany" required placeholder="e.g., Burundi Tourism Board" />
+          <input id="jobCompany" class="input" required placeholder="e.g., Burundi Tourism Board" />
 
           <label>Location</label>
-          <input id="jobLocation" required placeholder="e.g., Gitega" />
+          <input id="jobLocation" class="input" required placeholder="e.g., Gitega" />
 
           <label>Type</label>
-          <select id="jobType" required>
+          <select id="jobType" class="select" required>
             <option value="Internship">Internship</option>
             <option value="Part-time">Part-time</option>
             <option value="Full-time">Full-time</option>
@@ -509,12 +509,12 @@ function renderCommunity() {
           </select>
 
           <label>Description</label>
-          <textarea id="jobDesc" required placeholder="Role details, requirements, duration..."></textarea>
+          <textarea id="jobDesc" class="textarea" required placeholder="Role details, requirements, duration..."></textarea>
 
           <label>Apply Contact</label>
-          <input id="jobApply" required placeholder="email or phone" />
+          <input id="jobApply" class="input" required placeholder="email or phone" />
 
-          <button class="btn" type="submit">Post Job</button>
+          <button class="btn btn-primary" style="margin-top: 10px;" type="submit">Post Job</button>
         </form>
       </div>
     `;

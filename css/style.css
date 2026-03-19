@@ -335,19 +335,29 @@ img {
   box-shadow: var(--shadow, 0 10px 30px rgba(15, 23, 42, .08));
 }
 
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(15, 23, 42, .85);
+  margin-bottom: -6px;
+}
+
 .input,
 .select {
   padding: 12px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid rgba(229, 231, 235, .95);
-  background: rgba(245, 247, 250, .9);
+  background: #ffffff;
   outline: none;
   min-width: 220px;
+  transition: all 0.2s ease;
 }
 
 .input:focus,
 .select:focus {
-  border-color: rgba(11, 58, 106, .35)
+  border-color: var(--primary-color, #0B3A6A);
+  box-shadow: 0 0 0 3px rgba(11, 58, 106, .1);
 }
 
 .small {
@@ -622,11 +632,17 @@ img {
 .textarea {
   min-height: 120px;
   padding: 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid rgba(229, 231, 235, .95);
-  background: rgba(245, 247, 250, .9);
+  background: #ffffff;
   outline: none;
   resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.textarea:focus {
+  border-color: var(--primary-color, #0B3A6A);
+  box-shadow: 0 0 0 3px rgba(11, 58, 106, .1);
 }
 
 .notice {
