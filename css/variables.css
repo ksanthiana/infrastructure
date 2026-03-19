@@ -1,8 +1,12 @@
 :root {
-  --primary-color: #0B3A6A;
-  --secondary-color: #D71920;
-  --background: #F5F7FA;
-  --text: #0F172A;
+  --primary-color: #2b71f0;
+  --secondary-color: #1a1a3a;
+  --background: #fafafc;
+  --text: #334155;
+  --heading: #0f172a;
   --white: #FFFFFF;
-  --shadow: 0 10px 30px rgba(15, 23, 42, .12);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  --radius-xl: 24px;
 }
