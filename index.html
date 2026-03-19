@@ -9,28 +9,46 @@
 </head>
 
 <body>
+  <div id="fitCheckOverlay" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div class="modal-content">
+      <h2 style="color: #0f172a; font-weight: 800; font-size: 28px;">Who are you?</h2>
+      <p style="color: #64748b; font-size: 16px;">Tell us your journey type to help us verify safe landmarks.</p>
+      <div class="role-grid">
+        <button class="role-btn role-btn-tourist btn" style="background:#f1f5f9; color:#0f172a; width: 100%; border: 1px solid #cbd5e1; justify-content:center; gap: 8px; font-weight: 600;" onclick="setDiscoveryRole('Tourist')">
+          <span>🌍</span> I am a Tourist
+        </button>
+        <button class="role-btn role-btn-investor btn" style="background:#f1f5f9; color:#0f172a; width: 100%; border: 1px solid #cbd5e1; justify-content:center; gap: 8px; font-weight: 600;" onclick="setDiscoveryRole('Investor')">
+          <span>💼</span> I am an Investor
+        </button>
+        <button class="role-btn role-btn-community btn" style="background:#f1f5f9; color:#0f172a; width: 100%; border: 1px solid #cbd5e1; justify-content:center; gap: 8px; font-weight: 600;" onclick="setDiscoveryRole('Community')">
+          <span>🤝</span> I am a Community Member
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <header class="navbar">
+  <header class="navbar" style="background: transparent; border-bottom: none; position: absolute; width: 100%; z-index: 100;">
     <div class="container navbar-inner">
-      <a class="brand" href="index.html">
-        <div class="brand-badge"></div>
-        <div>SIT <span>Burundi</span></div>
+      <a class="brand" href="index.html" style="color: white;">
+        <div class="brand-badge" style="background: white; color: var(--primary-color); display:flex; align-items:center; justify-content:center;">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg>
+        </div>
+        <div style="color: white;">SIT <span style="color: rgba(255,255,255,0.8);">Burundi</span></div>
       </a>
 
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
-        <span class="nav-toggle-icon" aria-hidden="true">☰</span>
-        <span class="nav-toggle-text">Menu</span>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" style="background: rgba(255,255,255,0.1); color: white; border: none;">
+        <span class="nav-toggle-icon" aria-hidden="true" style="background:transparent; color:white;">☰</span>
       </button>
 
       <nav class="nav-links" id="siteNav">
-        <a href="index.html">Home</a>
-        <a href="tourism.html">Tourism</a>
-        <a href="infrastructure.html">Infrastructure</a>
-        <a href="investment.html">Investment</a>
-        <a href="community.html">Community</a>
-        <a href="admin.html">Admin</a>
-        <a class="nav-ghost" href="register.html">Sign up</a>
-        <a class="nav-cta" href="login.html">Login</a>
+        <a href="index.html" style="color: white;">Home</a>
+        <a href="tourism.html" style="color: rgba(255,255,255,0.8);">Tourism</a>
+        <a href="infrastructure.html" style="color: rgba(255,255,255,0.8);">Infrastructure</a>
+        <a href="investment.html" style="color: rgba(255,255,255,0.8);">Investment</a>
+        <a href="community.html" style="color: rgba(255,255,255,0.8);">Community</a>
+        <a href="admin.html" style="color: rgba(255,255,255,0.8);">Admin</a>
+        <a class="nav-ghost" href="register.html" style="color: white; background: rgba(255,255,255,0.1);">Sign up</a>
+        <a class="nav-cta" href="login.html" style="background: white; color: var(--primary-color);">Login</a>
       </nav>
       <div class="nav-auth" id="authArea"></div>
     </div>
@@ -51,15 +69,30 @@
           </div>
         </div>
 
-        <aside class="hero-card glass" style="border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); background: rgba(255,255,255,0.05);">
-          <h3 style="color: white; margin-bottom: 20px; font-size: 20px;">Platform Snapshot</h3>
-          <div class="kpi-grid">
-            <div class="kpi"><strong>28</strong><span>Mapped Zones</span></div>
-            <div class="kpi"><strong>15</strong><span>Projects Ready</span></div>
-            <div class="kpi"><strong>120</strong><span>Local Services</span></div>
-            <div class="kpi"><strong>45</strong><span>Inquiries</span></div>
-          </div>
-        </aside>
+        <div style="position: relative; width: 100%; height: 400px; display: flex; align-items: center; justify-content: center;">
+          <!-- Dotted Map Effect -->
+          <div style="position: absolute; width: 80%; height: 80%; background-image: radial-gradient(rgba(255,255,255,0.4) 2px, transparent 2px); background-size: 24px 24px; border-radius: 50%; mask-image: radial-gradient(circle, black 40%, transparent 70%); -webkit-mask-image: radial-gradient(circle, black 40%, transparent 70%);"></div>
+          
+          <!-- Floating Connected Nodes (Umurava Style) -->
+          <style>
+            @keyframes floatNode {
+              0% { transform: translateY(0px); }
+              50% { transform: translateY(-10px); }
+              100% { transform: translateY(0px); }
+            }
+            .node {
+              position: absolute;
+              border-radius: 50%;
+              border: 3px solid white;
+              box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+              background: white;
+            }
+          </style>
+          <img src="https://images.unsplash.com/photo-1531123897727-8f129e1bf38c?auto=format&fit=crop&w=100&q=80" class="node" style="top: 20%; left: 25%; width: 56px; animation: floatNode 3s ease-in-out infinite;">
+          <img src="https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=100&q=80" class="node" style="top: 60%; left: 15%; width: 48px; animation: floatNode 4s ease-in-out infinite;">
+          <img src="https://images.unsplash.com/photo-1488161628813-044c79402517?auto=format&fit=crop&w=100&q=80" class="node" style="top: 35%; left: 65%; width: 64px; animation: floatNode 3.5s ease-in-out infinite;">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80" class="node" style="top: 70%; left: 75%; width: 52px; animation: floatNode 4.5s ease-in-out infinite;">
+        </div>
       </div>
     </div>
   </section>
@@ -84,42 +117,38 @@
         <p style="font-size: 16px; margin: 0 auto; max-width: 600px;">Explore, check readiness, invest, and support communities seamlessly through an integrated, transparent platform.</p>
       </div>
 
-      <div class="grid-4">
-        <div class="card">
-          <div class="card-body">
-            <div class="badge">🏞️ Tourism</div>
-            <h3 class="card-title">Destinations</h3>
-            <p class="card-text">Find lakes, parks, and cultural sites with clear context.</p>
-            <a class="card-link" href="tourism.html">Open tourism →</a>
+      <div class="grid-2" style="max-width: 900px; margin: 0 auto; gap: 24px;">
+        <a href="tourism.html" class="btn" style="background:#f1f5f9; color:#0f172a; width: 100%; border: 1px solid #cbd5e1; justify-content:flex-start; gap: 20px; font-weight: 600; padding: 24px 32px; font-size: 20px; border-radius: 999px;">
+          <span style="font-size: 36px; line-height: 1;">🌍</span> 
+          <div style="text-align: left; line-height: 1.3;">
+            Tourism
+            <br><span style="font-size: 14px; color: #64748b; font-weight: 400;">Destinations & Parks</span>
           </div>
-        </div>
+        </a>
 
-        <div class="card">
-          <div class="card-body">
-            <div class="badge">🛣️ Infrastructure</div>
-            <h3 class="card-title">Readiness</h3>
-            <p class="card-text">See access, utilities, ICT and safety readiness scores.</p>
-            <a class="card-link" href="infrastructure.html">Open dashboard →</a>
+        <a href="infrastructure.html" class="btn" style="background:#f1f5f9; color:#0f172a; width: 100%; border: 1px solid #cbd5e1; justify-content:flex-start; gap: 20px; font-weight: 600; padding: 24px 32px; font-size: 20px; border-radius: 999px;">
+          <span style="font-size: 36px; line-height: 1;">🛣️</span> 
+          <div style="text-align: left; line-height: 1.3;">
+            Infrastructure
+            <br><span style="font-size: 14px; color: #64748b; font-weight: 400;">Readiness Dashboard</span>
           </div>
-        </div>
+        </a>
 
-        <div class="card">
-          <div class="card-body">
-            <div class="badge red">Investment</div>
-            <h3 class="card-title">Opportunities</h3>
-            <p class="card-text">Browse projects ready for partnership and job creation.</p>
-            <a class="card-link" href="investment.html">View opportunities →</a>
+        <a href="investment.html" class="btn" style="background:#f1f5f9; color:#0f172a; width: 100%; border: 1px solid #cbd5e1; justify-content:flex-start; gap: 20px; font-weight: 600; padding: 24px 32px; font-size: 20px; border-radius: 999px;">
+          <span style="font-size: 36px; line-height: 1;">💼</span> 
+          <div style="text-align: left; line-height: 1.3;">
+            Investment
+            <br><span style="font-size: 14px; color: #64748b; font-weight: 400;">Opportunities</span>
           </div>
-        </div>
+        </a>
 
-        <div class="card">
-          <div class="card-body">
-            <div class="badge">Community</div>
-            <h3 class="card-title">Jobs & Services</h3>
-            <p class="card-text">Connect guides, drivers, hotels, and local businesses.</p>
-            <a class="card-link" href="community.html">Open community →</a>
+        <a href="community.html" class="btn" style="background:#f1f5f9; color:#0f172a; width: 100%; border: 1px solid #cbd5e1; justify-content:flex-start; gap: 20px; font-weight: 600; padding: 24px 32px; font-size: 20px; border-radius: 999px;">
+          <span style="font-size: 36px; line-height: 1;">🤝</span> 
+          <div style="text-align: left; line-height: 1.3;">
+            Community
+            <br><span style="font-size: 14px; color: #64748b; font-weight: 400;">Jobs & Services</span>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>

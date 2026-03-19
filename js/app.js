@@ -892,4 +892,12 @@ document.addEventListener("DOMContentLoaded", () => {
       } else alert(res.message);
     });
   }
+
+  // 6. Global Discovery Role Modal
+  const role = getDiscoveryRole();
+  const overlay = $("fitCheckOverlay");
+  if (!role && overlay) {
+    // Show Fit Check if no role selected and the overlay is present (e.g. index.html or tourism.html)
+    overlay.style.display = "flex";
+  }
 });
