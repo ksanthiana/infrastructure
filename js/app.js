@@ -1,19 +1,48 @@
-// js/app.js
+// ============================================
+// SIT Burundi - Smart Infrastructure & Tourism Platform
+// Built by Kaze Ange Santhiana (ALU)
+// ============================================
 
+// Utility Functions
 function $(id) {
   return document.getElementById(id);
 }
 
+// Get URL query parameter safely
 function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
+// Get current timestamp in ISO format
 function nowISO() {
   return new Date().toISOString();
 }
 
+// Generate unique ID
 function uid(prefix = "id") {
   return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+}
+
+// Sanitize HTML to prevent XSS
+function sanitize(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed; bottom: 20px; right: 20px; padding: 14px 20px; 
+    background: ${type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#0B3A6A'};
+    color: white; border-radius: 10px; font-weight: 600; z-index: 10000;
+    animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 
 // -------------------- Tourism --------------------
@@ -21,14 +50,14 @@ function getDiscoveryRole() {
   return sessionStorage.getItem("discoveryRole");
 }
 
-window.setDiscoveryRole = function(role) {
+window.setDiscoveryRole = function (role) {
   sessionStorage.setItem("discoveryRole", role);
   const overlay = $("fitCheckOverlay");
   if (overlay) overlay.style.display = "none";
   renderDestinations();
 };
 
-window.handleSearch = function() {
+window.handleSearch = function () {
   renderDestinations();
 };
 
@@ -38,7 +67,7 @@ function renderDestinations() {
 
   const role = getDiscoveryRole();
   const overlay = $("fitCheckOverlay");
-  
+
   // Show Fit Check if no role selected and we are on tourism.html
   if (!role && overlay) {
     overlay.style.display = "flex";
@@ -48,14 +77,14 @@ function renderDestinations() {
   const catFilter = $("roleFilter") ? $("roleFilter").value : "";
 
   const filtered = destinations.filter(d => {
-    const matchesQuery = d.name.toLowerCase().includes(query) || 
-                         d.province.toLowerCase().includes(query) || 
-                         (d.landmarkDirections && d.landmarkDirections.toLowerCase().includes(query));
+    const matchesQuery = d.name.toLowerCase().includes(query) ||
+      d.province.toLowerCase().includes(query) ||
+      (d.landmarkDirections && d.landmarkDirections.toLowerCase().includes(query));
     const matchesCat = !catFilter || d.category === catFilter;
-    
+
     // Safety check: only show if the discovery role has visibility
     const roleVisible = !role || (d.visibilityRoles && d.visibilityRoles.includes(role));
-    
+
     return matchesQuery && matchesCat && roleVisible;
   });
 
@@ -610,7 +639,7 @@ function renderAdminPanel() {
   const jobBox = $("adminJobs");
   const contentBox = $("adminContent");
   const feedbackBox = $("adminFeedbacks");
-  
+
   if (!statsBox && !inqBox && !svcBox && !jobBox && !contentBox && !feedbackBox) return;
 
   const user = requireAuth(["Admin"]);
@@ -762,7 +791,7 @@ function renderAdminPanel() {
         lat: -3.3,
         lng: 29.3
       };
-      
+
       const updatedDest = [nD, ...destinations];
       saveDestinations(updatedDest);
       alert("New destination added successfully!");
@@ -801,7 +830,7 @@ function renderAdminPanel() {
   }
 }
 
-window.setFeedbackStatus = function(id, status) {
+window.setFeedbackStatus = function (id, status) {
   const items = getFeedbacks();
   const idx = items.findIndex(x => x.id === id);
   if (idx > -1) {
