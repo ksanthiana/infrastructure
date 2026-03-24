@@ -1,49 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Investment | SIT Burundi Smart Infrastructure & Tourism</title>
+  <title>Investment | SIT Burundi</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 
+  <!-- Navigation -->
   <header class="navbar">
     <div class="container navbar-inner">
       <a class="brand" href="index.html">
-        <div class="brand-badge"></div>
-        <div>SIT <span>Burundi</span></div>
+        <div class="brand-badge">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 22h20L12 2z" />
+          </svg>
+        </div>
+        <span>SIT Burundi</span>
       </a>
+
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
-        <span class="nav-toggle-icon" aria-hidden="true">☰</span>
-        <span class="nav-toggle-text">Menu</span>
+        <span class="nav-toggle-icon">☰</span>
       </button>
+
       <nav class="nav-links" id="siteNav">
         <a href="index.html">Home</a>
         <a href="tourism.html">Tourism</a>
         <a href="infrastructure.html">Infrastructure</a>
         <a href="investment.html" class="active">Investment</a>
         <a href="community.html">Community</a>
-        <a href="admin.html" data-admin-link style="display:none;">Admin</a>
+        <a href="admin.html" data-admin-link style="display: none;">Admin</a>
       </nav>
-      <div class="nav-auth" id="authArea"></div>
+
+      <div class="nav-auth" id="authArea">
+        <a class="nav-ghost" href="register.html">Sign up</a>
+        <a class="nav-cta" href="login.html">Login</a>
+      </div>
     </div>
   </header>
 
+  <!-- Main Content -->
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <h2>Strategic Opportunities</h2>
-        <p>Invest in community-verified infrastructure and tourism projects that drive safe, sustainable growth across Burundi.</p>
+        <h2>Investment Opportunities</h2>
+        <p>Find investment-ready projects across Burundi's tourism zones</p>
       </div>
-      
-      <div class="grid-3" id="investmentBox"></div>
+
+      <div class="grid-3" id="investmentBox">
+        <!-- Dynamically rendered -->
+      </div>
     </div>
   </section>
 
+  <!-- Footer -->
   <footer class="footer">
     <div class="container footer-inner">
-      <p>© 2026 SIT Burundi</p>
+      © 2026 SIT Burundi
     </div>
   </footer>
 
@@ -53,4 +69,5 @@
   <script src="js/app.js"></script>
   <script src="js/script.js" defer></script>
 </body>
+
 </html>

@@ -4,53 +4,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Register SIT Burundi</title>
+  <title>Register | SIT Burundi</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
+  <!-- Navigation -->
   <header class="navbar">
     <div class="container navbar-inner">
       <a class="brand" href="index.html">
-        <div class="brand-badge"></div>
-        <div>SIT <span>Burundi</span></div>
+        <div class="brand-badge">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 22h20L12 2z" />
+          </svg>
+        </div>
+        <span>SIT Burundi</span>
       </a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">☰ Menu</button>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
+        <span class="nav-toggle-icon">☰</span>
+      </button>
+
       <nav class="nav-links" id="siteNav">
         <a href="index.html">Home</a>
         <a href="tourism.html">Tourism</a>
         <a href="infrastructure.html">Infrastructure</a>
         <a href="investment.html">Investment</a>
         <a href="community.html">Community</a>
-        <a href="admin.html" data-admin-link>Admin</a>
+        <a href="admin.html" data-admin-link style="display: none;">Admin</a>
       </nav>
-      <div class="nav-auth" id="authArea"></div>
+
+      <div class="nav-auth" id="authArea">
+        <a class="nav-ghost" href="register.html">Sign up</a>
+        <a class="nav-cta" href="login.html">Login</a>
+      </div>
     </div>
   </header>
 
+  <!-- Register Form -->
   <section class="section">
     <div class="container">
       <div class="auth-centered">
         <div class="auth-card">
           <div class="section-header" style="text-align: center; margin-bottom: 24px;">
-            <h2 style="margin-bottom: 8px;">Create Account</h2>
+            <h2>Create Account</h2>
             <p>Join the SIT Burundi community</p>
           </div>
+
           <form id="registerForm" class="form-grid">
-            <div style="margin-bottom: 16px;">
+            <div>
               <label class="label">Full Name</label>
               <input id="regName" class="input" type="text" required placeholder="Enter your name" />
             </div>
-            <div style="margin-bottom: 16px;">
-              <label class="label">Email Address</label>
+            <div>
+              <label class="label">Email</label>
               <input id="regEmail" class="input" type="email" required placeholder="name@example.com" />
             </div>
-            <div style="margin-bottom: 16px;">
+            <div>
               <label class="label">Password</label>
               <input id="regPassword" class="input" type="password" required placeholder="Min 6 characters" />
             </div>
-            <div style="margin-bottom: 24px;">
-              <label class="label">Choose Your Role</label>
+            <div>
+              <label class="label">Role</label>
               <select id="regRole" class="select" required>
                 <option value="">Select a role</option>
                 <option value="Tourist">Tourist</option>
@@ -58,25 +73,28 @@
                 <option value="Community">Community Member</option>
               </select>
             </div>
-            <button class="btn btn-primary w-full" type="submit" style="width: 100%;">Create Account</button>
+            <button class="btn btn-primary w-full" type="submit">Create Account</button>
           </form>
-          <div id="registerNote" class="notice" style="margin-top: 24px; text-align: center;">Automatically logs you in after creation.</div>
-          <p style="text-align: center; margin-top: 24px; font-size: 14px; color: var(--slate-600);">
-            Already have an account? <a href="login.html" style="color: var(--primary); font-weight: 600;">Sign in</a>
+
+          <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #64748b;">
+            Already have an account? <a href="login.html" style="color: #0B3A6A; font-weight: 600;">Login</a>
           </p>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Footer -->
   <footer class="footer">
-    <div class="container footer-inner">© 2026 SIT Burundi</div>
+    <div class="container footer-inner">
+      © 2026 SIT Burundi
+    </div>
   </footer>
 
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
 </body>
 
 </html>

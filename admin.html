@@ -4,21 +4,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin SIT Burundi</title>
+  <title>Admin | SIT Burundi</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
+  <!-- Navigation -->
   <header class="navbar">
     <div class="container navbar-inner">
       <a class="brand" href="index.html">
-        <div class="brand-badge"></div>
-        <div>SIT <span>Burundi</span></div>
+        <div class="brand-badge">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 22h20L12 2z" />
+          </svg>
+        </div>
+        <span>SIT Burundi</span>
       </a>
+
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
-        <span class="nav-toggle-icon" aria-hidden="true">☰</span>
-        <span class="nav-toggle-text">Menu</span>
+        <span class="nav-toggle-icon">☰</span>
       </button>
+
       <nav class="nav-links" id="siteNav">
         <a href="index.html">Home</a>
         <a href="tourism.html">Tourism</a>
@@ -27,69 +33,78 @@
         <a href="community.html">Community</a>
         <a href="admin.html" class="active" data-admin-link>Admin</a>
       </nav>
-      <div class="nav-auth" id="authArea"></div>
+
+      <div class="nav-auth" id="authArea">
+        <!-- Dynamically rendered -->
+      </div>
     </div>
   </header>
 
+  <!-- Admin Content -->
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <span class="badge">Control Center</span>
+        <span class="badge">Admin</span>
         <h2 style="margin-top: 10px;">Admin Dashboard</h2>
-        <p>Review system inquiries, approve community services, and moderate job listings.</p>
+        <p>Manage content, review inquiries, and moderate platform</p>
       </div>
 
-      <!-- Admin Stats / KPIs -->
-      <div class="kpi-row" id="adminStats" style="margin-bottom: 40px;">
+      <!-- Stats -->
+      <div class="kpi-row" id="adminStats">
         <!-- Dynamically filled -->
       </div>
 
       <div class="split">
-        <!-- Main Actions Column -->
-        <div style="flex: 2;">
+        <!-- Main Content -->
+        <div>
+          <!-- Content Management -->
           <div class="card" style="margin-bottom: 24px;">
             <div class="card-body">
-              <h3 style="margin: 0 0 16px;">Content Management</h3>
-              <div id="adminContent">
-                <!-- Dynamically filled with forms to update Tourism and Infrastructure -->
+              <h3>Content Management</h3>
+              <div id="adminContent" style="margin-top: 16px;">
+                <!-- Dynamically filled -->
               </div>
             </div>
           </div>
 
+          <!-- Investor Inquiries -->
           <div class="card" style="margin-bottom: 24px;">
             <div class="card-body">
-              <h3 style="margin: 0 0 16px;">User Feedback & Reports</h3>
-              <div id="adminFeedbacks" class="table-responsive">
-                <!-- Dynamically filled with feedback table -->
+              <h3>Investor Inquiries</h3>
+              <div id="adminInquiries" style="margin-top: 16px; overflow-x: auto;">
+                <!-- Dynamically filled -->
               </div>
             </div>
           </div>
 
-          <div class="card" style="margin-bottom: 24px;">
-            <div class="card-body">
-              <h3 style="margin: 0 0 16px;">Investor Inquiries</h3>
-              <div id="adminInquiries" class="table-responsive">
-                <!-- Dynamically filled with table -->
-              </div>
-            </div>
-          </div>
-
+          <!-- Service Approvals -->
           <div class="card">
             <div class="card-body">
-              <h3 style="margin: 0 0 16px;">Service Approvals</h3>
-              <div id="adminServices" class="table-responsive">
-                <!-- Dynamically filled with table -->
+              <h3>Service Approvals</h3>
+              <div id="adminServices" style="margin-top: 16px; overflow-x: auto;">
+                <!-- Dynamically filled -->
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Sidebar Actions Column -->
-        <div style="flex: 1;">
+        <!-- Sidebar -->
+        <div>
+          <!-- Jobs Moderation -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-body">
+              <h3>Jobs Moderation</h3>
+              <div id="adminJobs" style="margin-top: 16px;">
+                <!-- Dynamically filled -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Feedback -->
           <div class="card">
             <div class="card-body">
-              <h3 style="margin: 0 0 16px;">Jobs Moderation</h3>
-              <div id="adminJobs">
+              <h3>User Feedback</h3>
+              <div id="adminFeedbacks" style="margin-top: 16px; overflow-x: auto;">
                 <!-- Dynamically filled -->
               </div>
             </div>
@@ -99,15 +114,17 @@
     </div>
   </section>
 
+  <!-- Footer -->
   <footer class="footer">
-    <div class="container footer-inner">© 2026 SIT Burundi</div>
+    <div class="container footer-inner">
+      © 2026 SIT Burundi
+    </div>
   </footer>
 
   <script src="js/data.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
-
 </body>
 
 </html>
