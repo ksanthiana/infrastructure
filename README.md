@@ -3,9 +3,9 @@
 ## Overview
 The **Smart Infrastructure and Tourism Development Platform** is a web-based innovation designed to bridge the gap between tourism promotion, infrastructure monitoring, investment preparedness, and community engagement in Burundi. It provides interactive maps, destination profiles, infrastructure readiness dashboards, investment listings, and local job portals.
 
-**Live Demo:** [Insert URL to Live Deployment Here]
-**SRS Document:** [Insert Link to Google Doc SRS Here]
-**Video Walkthrough:** [Insert Link to Video Here]
+**Live Demo:** https://ksanthiana.github.io/infrastructure/index.html
+**SRS Document:** [Link to Google Doc SRS]
+**Video Walkthrough:** [Link to Video]
 
 ## Problem Statement
 Burundi possesses immense tourism potential, from the shores of Lake Tanganyika to the peaks of Mount Heha. However, this potential is hindered by:
