@@ -5,6 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
+const { sendApprovalEmail, sendRejectionEmail, sendPendingEmail } = require('../emailService');
 
 // Get all investment opportunities (FR-09)
 router.get('/opportunities', (req, res) => {
@@ -49,12 +50,55 @@ router.get('/inquiries', (req, res) => {
 });
 
 // Update inquiry status (admin)
-router.patch('/inquiries/:id', (req, res) => {
+router.patch('/inquiries/:id', async (req, res) => {
     try {
-        const { status } = req.body;
-        db.prepare('UPDATE inquiries SET status = ? WHERE id = ?').run(status, req.params.id);
-        res.json({ message: 'Status updated' });
+        const { status, rejectionReason } = req.body;
+        const inquiryId = req.params.id;
+
+        // Get inquiry details before updating
+        const inquiry = db.prepare('SELECT * FROM inquiries WHERE id = ?').get(inquiryId);
+
+        if (!inquiry) {
+            return res.status(404).json({ error: 'Inquiry not found' });
+        }
+
+        // Update status
+        db.prepare('UPDATE inquiries SET status = ? WHERE id = ?').run(status, inquiryId);
+
+        // Send email notification based on status
+        let emailResult = { success: false };
+
+        if (status === 'Approved') {
+            emailResult = await sendApprovalEmail(
+                inquiry.investor_email,
+                inquiry.investor_name,
+                inquiry.type,
+                inquiry.message
+            );
+        } else if (status === 'Rejected') {
+            emailResult = await sendRejectionEmail(
+                inquiry.investor_email,
+                inquiry.investor_name,
+                inquiry.type,
+                inquiry.message,
+                rejectionReason
+            );
+        } else if (status === 'Pending') {
+            emailResult = await sendPendingEmail(
+                inquiry.investor_email,
+                inquiry.investor_name,
+                inquiry.type,
+                inquiry.message
+            );
+        }
+
+        res.json({
+            message: 'Status updated',
+            emailSent: emailResult.success,
+            emailMessageId: emailResult.messageId
+        });
     } catch (error) {
+        console.error('Error updating inquiry:', error);
         res.status(500).json({ error: 'Failed to update inquiry' });
     }
 });
