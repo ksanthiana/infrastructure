@@ -1,89 +1,98 @@
 # Smart Infrastructure & Tourism Development Platform for Burundi
 
 ## Overview
-The **Smart Infrastructure and Tourism Development Platform** is a web-based innovation designed to bridge the gap between tourism promotion, infrastructure monitoring, investment preparedness, and community engagement in Burundi.
+The **Smart Infrastructure and Tourism Development Platform** is a full-stack web application designed to bridge the gap between tourism promotion, infrastructure monitoring, investment preparedness, and community engagement in Burundi.
 
-**Live Demo:** https://ksanthiana.github.io/infrastructure/index.html
+## Architecture
 
-## Problem Statement
-Burundi possesses immense tourism potential, from the shores of Lake Tanganyika to the peaks of Mount Heha. However, this potential is hindered by:
-1. Fragmented information about tourist destinations
-2. Unclear infrastructure readiness around sites
-3. Lack of visibility for investors
-4. Limited digital presence for local communities
+This is a **full-stack application** with:
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **Backend**: Node.js + Express API
+- **Database**: SQLite (better-sqlite3)
 
-## Solution
-This platform offers an integrated, role-based digital ecosystem:
-- **Tourists** explore destinations and plan safe routes
-- **Investors** evaluate infrastructure readiness and find opportunities
-- **Community Members** register services and find jobs
-- **Admins** manage content and generate reports
+## Live Demo
+**Frontend:** https://ksanthiana.github.io/infrastructure/index.html
+
+## Running Locally
+
+### Frontend Only (Current Demo)
+Simply open `index.html` in your browser - uses LocalStorage for demo data.
+
+### Full Stack (With Backend)
+```bash
+# Navigate to backend
+cd backend
+
+# Install dependencies
+npm install
+
+# Start server
+npm start
+```
+
+Server runs at: http://localhost:3000
 
 ## Features
-- Interactive tourism map with destination profiles
-- Infrastructure readiness dashboards by zone
-- Investment opportunity listings with inquiry system
-- Community service registration
-- Job listings portal
-- Role-based access control (RBAC)
-- Admin dashboard for content management
 
-## Tech Stack
-- HTML5, CSS3, JavaScript (ES6+)
-- Leaflet.js for interactive mapping
-- LocalStorage for data persistence
-- GitHub Pages deployment
+| Module | Features |
+|--------|----------|
+| **Tourism** | Interactive map, destination listings, search/filter |
+| **Infrastructure** | Readiness dashboards, zone scores, recommendations |
+| **Investment** | Opportunity listings, inquiry submission |
+| **Community** | Service registration, job listings, feedback |
+| **Admin** | Content management, reports, user moderation |
 
-## Quick Start
+## User Roles
 
-### Method 1: Live Demo
-Visit: https://ksanthiana.github.io/infrastructure/index.html
+| Role | Access |
+|------|--------|
+| Tourist | Browse destinations, submit feedback |
+| Investor | View opportunities, send inquiries |
+| Community | Register services, view jobs |
+| Admin | Full access to all features |
 
-### Method 2: Local Development
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ksanthiana/infrastructure.git
-   cd infrastructure
-   ```
-
-2. Open `index.html` in your browser, or use a local server:
-   ```bash
-   # If using VS Code, install "Live Server" extension
-   # Right-click index.html → Open with Live Server
-   ```
-
-## Testing Roles
-
-### Admin Account
+## Default Admin Account
 - Email: admin@sitburundi.com
 - Password: Admin123!
 
-### Create New Account
-1. Go to Register page
-2. Choose role: Tourist, Investor, or Community
-3. Login with your credentials
+## API Documentation
 
-## Project Structure
-```
-├── index.html          # Home page
-├── tourism.html       # Destinations listing
-├── infrastructure.html # Readiness dashboard
-├── investment.html     # Investment opportunities
-├── community.html     # Community & jobs
-├── admin.html         # Admin dashboard
-├── login.html         # Authentication
-├── register.html      # User registration
-├── destination.html   # Destination details
-├── css/
-│   ├── style.css      # Main styles
-│   └── variables.css  # CSS variables
-└── js/
-    ├── app.js         # Main application logic
-    ├── data.js        # Data definitions
-    ├── auth.js        # Authentication
-    ├── storage.js     # LocalStorage wrapper
-    └── script.js      # UI utilities
-```
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login
+- `GET /api/auth/me` - Current user
+
+### Tourism
+- `GET /api/tourism/destinations` - All destinations
+- `GET /api/tourism/destinations/:id` - Single destination
+
+### Infrastructure
+- `GET /api/infrastructure/zones` - Zone readiness scores
+- `GET /api/infrastructure/summary` - Summary stats
+
+### Investment
+- `GET /api/investment/opportunities` - Investment listings
+- `POST /api/investment/inquiry` - Submit inquiry
+
+### Community
+- `GET /api/community/services` - Approved services
+- `POST /api/community/services` - Register service
+- `GET /api/community/jobs` - Job listings
+- `POST /api/community/feedback` - Submit feedback
+
+### Admin
+- `GET /api/admin/stats` - Dashboard stats
+- `POST /api/admin/destinations` - Add destination
+- `GET /api/admin/report/:type` - Generate report
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | HTML5, CSS3, JavaScript, Leaflet.js |
+| Backend | Node.js, Express, JWT |
+| Database | SQLite (better-sqlite3) |
+| Authentication | bcrypt + JWT tokens |
 
 ## License
 © 2026 SIT Burundi - Built by Kaze Ange Santhiana (ALU)
