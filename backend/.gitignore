@@ -56,5 +56,4 @@ jspm_packages/
 .DS_Store
 Thumbs.db
 
-# Render deployment
-render.yaml
+
