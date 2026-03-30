@@ -1,180 +1,264 @@
 // ============================================
 // Database Configuration
-// Using better-sqlite3 for SQLite database
+// Supports both SQLite (local) and PostgreSQL (production)
 // ============================================
 
-const Database = require('better-sqlite3');
 const path = require('path');
 
-const db = new Database(path.join(__dirname, 'sitburundi.db'));
+// Database abstraction layer
+class DatabaseManager {
+    constructor() {
+        this.dbType = process.env.DATABASE_URL ? 'postgres' : 'sqlite';
+        this.db = null;
+        this.init();
+    }
 
-// Enable foreign keys
-db.pragma('foreign_keys = ON');
+    init() {
+        if (this.dbType === 'postgres') {
+            this.initPostgreSQL();
+        } else {
+            this.initSQLite();
+        }
+    }
+
+    initSQLite() {
+        const Database = require('better-sqlite3');
+        this.db = new Database(path.join(__dirname, 'sitburundi.db'));
+        this.db.pragma('foreign_keys = ON');
+        console.log('✓ Using SQLite database (local development)');
+    }
+
+    initPostgreSQL() {
+        const { Pool } = require('pg');
+        this.db = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+        });
+        console.log('✓ Using PostgreSQL database (production)');
+    }
+
+    // Execute SQL query
+    async query(sql, params = []) {
+        if (this.dbType === 'postgres') {
+            const result = await this.db.query(sql, params);
+            return result.rows;
+        } else {
+            return this.db.prepare(sql).all(...params);
+        }
+    }
+
+    // Execute SQL and return single row
+    async get(sql, params = []) {
+        if (this.dbType === 'postgres') {
+            const result = await this.db.query(sql, params);
+            return result.rows[0];
+        } else {
+            return this.db.prepare(sql).get(...params);
+        }
+    }
+
+    // Execute SQL (INSERT, UPDATE, DELETE)
+    async run(sql, params = []) {
+        if (this.dbType === 'postgres') {
+            const result = await this.db.query(sql, params);
+            return { changes: result.rowCount, lastID: result.rows[0]?.id };
+        } else {
+            const stmt = this.db.prepare(sql);
+            const result = stmt.run(...params);
+            return { changes: result.changes, lastID: result.lastInsertRowid };
+        }
+    }
+
+    // Execute multiple SQL statements
+    async exec(sql) {
+        if (this.dbType === 'postgres') {
+            await this.db.query(sql);
+        } else {
+            this.db.exec(sql);
+        }
+    }
+
+    // Prepare statement (SQLite only)
+    prepare(sql) {
+        if (this.dbType === 'postgres') {
+            return {
+                run: async (...params) => this.run(sql, params),
+                get: async (...params) => this.get(sql, params),
+                all: async (...params) => this.query(sql, params)
+            };
+        } else {
+            return this.db.prepare(sql);
+        }
+    }
+}
+
+// Create database manager instance
+const dbManager = new DatabaseManager();
 
 // Initialize database schema
-function initDatabase() {
+async function initDatabase() {
+    const isPostgres = dbManager.dbType === 'postgres';
+    
     // Users table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'Tourist',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS users (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'Tourist',
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Destinations table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS destinations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      region TEXT NOT NULL,
-      province TEXT NOT NULL,
-      category TEXT NOT NULL,
-      label TEXT,
-      description TEXT,
-      image TEXT,
-      landmark_directions TEXT,
-      verified_by TEXT,
-      services TEXT,
-      zone_id TEXT,
-      lat REAL,
-      lng REAL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS destinations (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            name TEXT NOT NULL,
+            region TEXT NOT NULL,
+            province TEXT NOT NULL,
+            category TEXT NOT NULL,
+            label TEXT,
+            description TEXT,
+            image TEXT,
+            landmark_directions TEXT,
+            verified_by TEXT,
+            services TEXT,
+            zone_id TEXT,
+            lat REAL,
+            lng REAL,
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Infrastructure zones table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS infrastructure_zones (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      road INTEGER DEFAULT 0,
-      transport INTEGER DEFAULT 0,
-      ict INTEGER DEFAULT 0,
-      electricity INTEGER DEFAULT 0,
-      water INTEGER DEFAULT 0,
-      accommodation INTEGER DEFAULT 0,
-      key_gap TEXT,
-      recommendation TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS infrastructure_zones (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            name TEXT NOT NULL,
+            road INTEGER DEFAULT 0,
+            transport INTEGER DEFAULT 0,
+            ict INTEGER DEFAULT 0,
+            electricity INTEGER DEFAULT 0,
+            water INTEGER DEFAULT 0,
+            accommodation INTEGER DEFAULT 0,
+            key_gap TEXT,
+            recommendation TEXT,
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Investment opportunities table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS investments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      sector TEXT,
-      location TEXT,
-      zone_id TEXT,
-      budget TEXT,
-      expected_impact TEXT,
-      roi TEXT,
-      summary TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS investments (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            title TEXT NOT NULL,
+            sector TEXT,
+            location TEXT,
+            zone_id TEXT,
+            budget TEXT,
+            expected_impact TEXT,
+            roi TEXT,
+            summary TEXT,
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Investor inquiries table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS inquiries (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      investor_name TEXT NOT NULL,
-      investor_email TEXT NOT NULL,
-      zone TEXT,
-      type TEXT,
-      message TEXT,
-      status TEXT DEFAULT 'New',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS inquiries (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            investor_name TEXT NOT NULL,
+            investor_email TEXT NOT NULL,
+            zone TEXT,
+            type TEXT,
+            message TEXT,
+            status TEXT DEFAULT 'New',
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Community services table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS services (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      owner_name TEXT NOT NULL,
-      owner_email TEXT,
-      business_name TEXT NOT NULL,
-      category TEXT,
-      location TEXT,
-      description TEXT,
-      contact TEXT,
-      status TEXT DEFAULT 'Pending',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS services (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            owner_name TEXT NOT NULL,
+            owner_email TEXT,
+            business_name TEXT NOT NULL,
+            category TEXT,
+            location TEXT,
+            description TEXT,
+            contact TEXT,
+            status TEXT DEFAULT 'Pending',
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Jobs table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS jobs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      company TEXT NOT NULL,
-      location TEXT,
-      type TEXT,
-      description TEXT,
-      apply_contact TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS jobs (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            title TEXT NOT NULL,
+            company TEXT NOT NULL,
+            location TEXT,
+            type TEXT,
+            description TEXT,
+            apply_contact TEXT,
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Feedback table
-    db.exec(`
-    CREATE TABLE IF NOT EXISTS feedbacks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_name TEXT,
-      user_email TEXT,
-      subject TEXT,
-      message TEXT,
-      status TEXT DEFAULT 'Pending',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    await dbManager.exec(`
+        CREATE TABLE IF NOT EXISTS feedbacks (
+            id ${isPostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT'},
+            user_name TEXT,
+            user_email TEXT,
+            subject TEXT,
+            message TEXT,
+            status TEXT DEFAULT 'Pending',
+            created_at ${isPostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP'}
+        )
+    `);
 
     // Seed default admin user
-    const adminExists = db.prepare('SELECT id FROM users WHERE email = ?').get('admin@sitburundi.com');
+    const adminExists = await dbManager.get('SELECT id FROM users WHERE email = ?', ['admin@sitburundi.com']);
     if (!adminExists) {
         const bcrypt = require('bcryptjs');
         const hashedPassword = bcrypt.hashSync('Admin123!', 10);
-        db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)').run(
-            'Platform Admin',
-            'admin@sitburundi.com',
-            hashedPassword,
-            'Admin'
+        await dbManager.run(
+            'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+            ['Platform Admin', 'admin@sitburundi.com', hashedPassword, 'Admin']
         );
         console.log('✓ Default admin user created');
     }
 
     // Seed destinations if empty
-    const destCount = db.prepare('SELECT COUNT(*) as count FROM destinations').get();
+    const destCount = await dbManager.get('SELECT COUNT(*) as count FROM destinations');
     if (destCount.count === 0) {
-        seedDestinations(db);
+        await seedDestinations();
         console.log('✓ Seed destinations added');
     }
 
     // Seed infrastructure zones if empty
-    const zoneCount = db.prepare('SELECT COUNT(*) as count FROM infrastructure_zones').get();
+    const zoneCount = await dbManager.get('SELECT COUNT(*) as count FROM infrastructure_zones');
     if (zoneCount.count === 0) {
-        seedInfrastructureZones(db);
+        await seedInfrastructureZones();
         console.log('✓ Seed infrastructure zones added');
     }
 
     // Seed jobs if empty
-    const jobCount = db.prepare('SELECT COUNT(*) as count FROM jobs').get();
+    const jobCount = await dbManager.get('SELECT COUNT(*) as count FROM jobs');
     if (jobCount.count === 0) {
-        seedJobs(db);
+        await seedJobs();
         console.log('✓ Seed jobs added');
     }
 
     console.log('✓ Database initialized successfully');
 }
 
-function seedDestinations(db) {
+async function seedDestinations() {
     const destinations = [
         {
             name: 'Lake Tanganyika',
@@ -184,7 +268,7 @@ function seedDestinations(db) {
             label: 'Lake',
             description: "Burundi's most iconic lakeside destination with beaches, sunsets, and restaurants.",
             image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80',
-            landmark_directions: 'Located along the Chaussée d\'Uvira, follow the main road towards the port.',
+            landmark_directions: "Located along the Chaussée d'Uvira, follow the main road towards the port.",
             verified_by: 'Bujumbura Local Guide Hub',
             services: 'Hotels,Restaurants,Boat tours,Local transport',
             zone_id: 'bujumbura',
@@ -242,7 +326,7 @@ function seedDestinations(db) {
             province: 'Bururi',
             category: 'culture',
             label: 'Landmark',
-            description: 'Visit the southern-most source of the world\'s longest river.',
+            description: "Visit the southern-most source of the world's longest river.",
             image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
             landmark_directions: 'Located in Rutovu. Look for the pyramid monument atop the hill near the village center.',
             verified_by: 'Rutovu Heritage Trust',
@@ -253,17 +337,16 @@ function seedDestinations(db) {
         }
     ];
 
-    const stmt = db.prepare(`
-    INSERT INTO destinations (name, region, province, category, label, description, image, landmark_directions, verified_by, services, zone_id, lat, lng)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
     for (const d of destinations) {
-        stmt.run(d.name, d.region, d.province, d.category, d.label, d.description, d.image, d.landmark_directions, d.verified_by, d.services, d.zone_id, d.lat, d.lng);
+        await dbManager.run(
+            `INSERT INTO destinations (name, region, province, category, label, description, image, landmark_directions, verified_by, services, zone_id, lat, lng)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [d.name, d.region, d.province, d.category, d.label, d.description, d.image, d.landmark_directions, d.verified_by, d.services, d.zone_id, d.lat, d.lng]
+        );
     }
 }
 
-function seedInfrastructureZones(db) {
+async function seedInfrastructureZones() {
     const zones = [
         { name: 'Bujumbura Lakeshore', road: 85, transport: 88, ict: 90, electricity: 80, water: 84, accommodation: 92, key_gap: 'Waste management', recommendation: 'Improve cleanliness and visitor facilities.' },
         { name: 'Gitega Cultural Corridor', road: 74, transport: 68, ict: 66, electricity: 70, water: 73, accommodation: 61, key_gap: 'Accommodation capacity', recommendation: 'Support eco-lodges and event-ready stays.' },
@@ -271,31 +354,33 @@ function seedInfrastructureZones(db) {
         { name: 'Rutovu Landmark Zone', road: 58, transport: 49, ict: 42, electricity: 51, water: 60, accommodation: 40, key_gap: 'Transport and ICT', recommendation: 'Expand shuttle routes and signage.' }
     ];
 
-    const stmt = db.prepare(`
-    INSERT INTO infrastructure_zones (name, road, transport, ict, electricity, water, accommodation, key_gap, recommendation)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
     for (const z of zones) {
-        stmt.run(z.name, z.road, z.transport, z.ict, z.electricity, z.water, z.accommodation, z.key_gap, z.recommendation);
+        await dbManager.run(
+            `INSERT INTO infrastructure_zones (name, road, transport, ict, electricity, water, accommodation, key_gap, recommendation)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [z.name, z.road, z.transport, z.ict, z.electricity, z.water, z.accommodation, z.key_gap, z.recommendation]
+        );
     }
 }
 
-function seedJobs(db) {
+async function seedJobs() {
     const jobs = [
         { title: 'Senior Eco-Guide', company: 'Kibira Discovery', location: 'Kayanza', type: 'Full-time', description: 'Lead forest treks and educate visitors on biodiversity.', apply_contact: 'jobs@kibiradiscovery.bi' },
         { title: 'Tourist Shuttle Driver', company: 'SIT Logistics', location: 'Bujumbura', type: 'Contract', description: 'Provide safe transport between destinations.', apply_contact: 'drive@sit-logistics.bi' },
         { title: 'Hospitality Manager', company: 'Lakeside Lodge', location: 'Lake Tanganyika', type: 'Full-time', description: 'Manage guest services and ensure high standards.', apply_contact: 'careers@lakesidelodge.bi' }
     ];
 
-    const stmt = db.prepare(`
-    INSERT INTO jobs (title, company, location, type, description, apply_contact)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-
     for (const j of jobs) {
-        stmt.run(j.title, j.company, j.location, j.type, j.description, j.apply_contact);
+        await dbManager.run(
+            `INSERT INTO jobs (title, company, location, type, description, apply_contact)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [j.title, j.company, j.location, j.type, j.description, j.apply_contact]
+        );
     }
 }
 
-module.exports = { db, initDatabase };
+// Export database manager and init function
+module.exports = { 
+    db: dbManager, 
+    initDatabase 
+};
